@@ -25,6 +25,9 @@ environment — spend, what's running, alerts, overall status — strictly read-
   sign-in. Totals are per currency. Any account whose costs can't be read makes the total "partial".
 - Q: When is cost data stale? → A: After 24 hours. Stale data gets a label on the spend figures
   only, and the overall status is unaffected.
+- Q: Should Cloud Storage buckets be in the MVP? → A: Yes, as a full group. Each bucket shows its
+  project, location, and size; the header shows the total size. Buckets show as unknown (not
+  monitored) unless an alert is open.
 
 ## User Scenarios & Testing *(mandatory)*
 
@@ -78,6 +81,7 @@ The owner opens the menu and sees the things they actually run, grouped by kind 
 - Cloud Run services
 - Cloud SQL instances
 - Vertex AI endpoints
+- Cloud Storage buckets, each with its size, and the total size in the group header
 
 Each item shows its name, a status marker, and the project it belongs to. Hovering an item opens a
 small submenu with its state, location, project, and a link to its page in the Cloud Console. Each
@@ -151,9 +155,17 @@ degraded, and down respectively.
    its name, project, severity, and how long it has been open, and links to the Cloud Console.
 6. **Given** no alerts are open, **When** the owner opens the Alerts section, **Then** it reads "No
    open alerts", followed by the number of alert policies across the listed projects.
-7. **Given** any mix of resource statuses, **When** the overall status is computed, **Then** it is
-   the worst status among the listed resources and billing, with one exception: if every resource
-   is unknown, the overall status is unknown, not healthy.
+7. **Given** any mix of resource statuses, **When** the overall status is computed, **Then**:
+   - it is **down** if anything is down;
+   - otherwise **degraded** if anything is degraded, including spend over budget;
+   - otherwise **healthy** if at least one resource is healthy;
+   - otherwise **unknown**.
+
+   Unknown items never pull the overall status down, and never make it look healthy on their own.
+8. **Given** a Cloud Storage bucket exists, **When** status is computed, **Then** it is **unknown
+   (not monitored)**, because buckets have no running state to report. If an open alert names
+   the bucket's project and storage, it is **degraded** or **down** by that alert's severity. A
+   bucket is never shown as healthy.
 
 ---
 
@@ -209,6 +221,11 @@ the cloud environment changes.
   stale, and the setup check names the sign-in step.
 - **Many resources or projects:** within each service group, items are sorted worst status
   first, then by project, then by name. The owner can exclude projects in settings.
+- **A group with more than 25 items** (common for buckets): the first 25 are shown in sort order,
+  followed by "and N more", which links to that service's console page. The header count and
+  total size still cover every item.
+- **A newly created bucket** whose size isn't reported yet shows "size pending" and is left out
+  of the total, with the total labelled partial.
 - **Same resource name in two projects:** both are listed. The project label tells them apart.
 - **Archived projects or projects with billing disabled:** shown as unknown with the reason
   "billing disabled", or left out if pending deletion.
@@ -267,11 +284,16 @@ the cloud environment changes.
 **Projects and resources**
 
 - **FR-006**: The menu MUST group resources by service type: Cloud Run services, Cloud SQL
-  instances, and Vertex AI endpoints in the configured regions. Each group header shows its count
-  and its worst status. Each item shows its name, status marker, and project display name.
+  instances, Vertex AI endpoints in the configured regions, and Cloud Storage buckets. Each group
+  header shows its count and its worst status. Each item shows its name, status marker, and project display name.
   Projects excluded in settings are left out. Groups with no items are omitted.
 - **FR-007**: Each resource's submenu MUST show its reported state, location, project, status
   reason, and a link to its page in the Cloud Console.
+- **FR-023**: The Cloud Storage group MUST show each bucket's project, location, and stored size.
+  The group header shows the total stored size across all listed buckets, in readable units (for
+  example "8 buckets · 412 GB"). Size figures may be up to a day old. They are labelled with their
+  as-of date and count as stale after 48 hours. A bucket whose size cannot be read shows "size
+  unavailable", and the total is labelled partial.
 - **FR-008**: The menu MUST include a "Projects (N)" reference line. Its submenu lists each
   accessible project with a console link and its count of enabled APIs. A view that lists each
   project's resources beneath it is deferred to a later feature.
@@ -340,7 +362,8 @@ the cloud environment changes.
 - **Project**: a Google Cloud project the owner can access, with a display name, an identifier,
   whether billing is enabled, and the count of enabled APIs. In the MVP it appears as a label on
   each resource and in the Projects reference list.
-- **Resource**: a Cloud Run service, Cloud SQL instance, or Vertex AI endpoint, with a type, name,
+- **Resource**: a Cloud Run service, Cloud SQL instance, Vertex AI endpoint, or Cloud Storage
+  bucket (which also carries its stored size and the size's as-of date), with a type, name,
   location, owning project, reported state, computed status with reason, and console link.
 - **Billing account**: an account visible to the owner, with its name, currency, its own spend
   figures, its budgets, and whether its cost data is readable.
@@ -397,6 +420,6 @@ the cloud environment changes.
   - push-based budget notifications
   - macOS notifications
   - any write actions (start, stop, deploy, enable)
-  - resource types other than Cloud Run, Cloud SQL, and Vertex AI endpoints
-  - Cloud Storage bucket counts and other extra totals from the original mockup
+  - resource types other than Cloud Run, Cloud SQL, Vertex AI endpoints, and Cloud Storage buckets
+  - per-object listings or storage cost breakdowns for buckets
   - a view that lists each project's resources beneath it (planned as a follow-up feature)
