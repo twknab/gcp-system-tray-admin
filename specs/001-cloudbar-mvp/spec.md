@@ -18,6 +18,9 @@ environment — spend, what's running, alerts, overall status — strictly read-
   policy for a type covers all resources of that type in the project. The menu leads with
   resources grouped by service type, each labelled with its project. A view organised by project
   comes later.
+- Q: Where does the monthly budget come from? → A: Only from the budgets defined on the billing
+  account in Google Cloud. If none exist, CloudBar shows "No budget set". There is no local
+  budget setting.
 
 ## User Scenarios & Testing *(mandatory)*
 
@@ -53,9 +56,13 @@ data age.
    **Then** the billing section reads "Costs unavailable", gives a one-line reason, and offers an
    item that opens written setup steps for the owner to follow. The title shows the indicator and
    status but no amount. CloudBar does not set anything up itself.
-4. **Given** no monthly budget is configured, **When** the owner opens the billing summary, **Then**
-   the budget and remaining lines say "No budget set" instead of showing $0 or leaving the lines out.
-5. **Given** month-to-date spend exceeds the budget, **When** the owner views the summary, **Then**
+4. **Given** no budget is defined on the billing account in Google Cloud, **When** the owner opens
+   the billing summary, **Then** the budget and remaining lines say "No budget set", with a link to
+   the console's Budgets page. They never show $0, and they are not left out.
+5. **Given** a budget is defined on the billing account in Google Cloud, **When** the owner opens
+   the billing summary, **Then** the budget amount shown is that budget's monthly amount, labelled
+   with the budget's name. CloudBar only reads it and never creates or edits budgets.
+6. **Given** month-to-date spend exceeds the budget, **When** the owner views the summary, **Then**
    the remaining amount is shown as overspent, and the overall status is at least degraded.
 
 ---
@@ -183,7 +190,6 @@ the cloud environment changes.
 4. **Given** the owner chooses Refresh, **When** the menu re-renders, **Then** every source is
    fetched fresh regardless of how old the cached data is, and the "Updated" time resets.
 5. **Given** the owner chooses Settings, **When** it opens, **Then** they can edit:
-   - the monthly budget
    - the cost-data location
    - the Vertex AI regions
    - projects to exclude
@@ -204,6 +210,13 @@ the cloud environment changes.
   "billing disabled", or left out if pending deletion.
 - **Start of the month:** month-to-date may legitimately be $0.00 or not yet reported. Show the
   amount with its data age, never "unavailable" just because it is small.
+- **Several budgets on one billing account:** a budget scoped to the whole billing account is
+  preferred over budgets scoped to particular projects or services. If more than one remains, each
+  is shown on its own line with its name. Their amounts are not added together.
+- **Budget set to "last month's spend":** the amount shown is last month's net spend from the cost
+  data, labelled as such. If last month is unavailable, it shows "Budget amount unavailable".
+- **Budgets cannot be read** (missing permission or API not enabled): the budget lines show
+  "Unavailable" with the reason, and the setup check names the fix. Spend still displays.
 - **Credits exceed charges:** net spend can be negative or zero. It is shown as reported.
 - **Cost data lag:** the data age is always visible. Cost data more than 48 hours old is labelled
   stale.
@@ -233,6 +246,10 @@ the cloud environment changes.
   be estimated from resource lists or prices.
 - **FR-005**: When the cost export is not available, the billing section MUST say "Costs
   unavailable", give the reason, and link to setup steps the owner performs.
+
+- **FR-021**: The budget MUST be read from the budget definitions on the owner's billing account in
+  Google Cloud. If none exist, CloudBar shows "No budget set". It MUST NOT create or change
+  budgets.
 
 **Projects and resources**
 
@@ -293,7 +310,6 @@ the cloud environment changes.
 - **FR-018**: CloudBar MUST use the owner's existing Google Cloud sign-in on the machine. It MUST
   NOT ask for, store, or ship credentials or keys of its own.
 - **FR-019**: Settings MUST be stored on the owner's machine outside the code repository:
-  - monthly budget
   - cost-data location
   - Vertex AI regions (default `us-central1`)
   - excluded projects
@@ -314,7 +330,7 @@ the cloud environment changes.
 - **Status**: one of healthy, degraded, down, or unknown, with an optional short reason.
 - **Source result**: for each kind of data, the value or the failure reason, when it was fetched,
   and whether it is stale.
-- **Settings**: budget, cost-data location, Vertex AI regions, and excluded projects.
+- **Settings**: cost-data location, Vertex AI regions, and excluded projects.
 - **Setup finding**: one checked item with pass, warning, or fail, a plain-language explanation,
   and a next step.
 
@@ -348,8 +364,8 @@ the cloud environment changes.
   performs, guided by the setup check. Spend history from before it was enabled may be partial or
   missing, so last month may be unavailable at first.
 - Cost data lags real usage by hours. That lag is acceptable as long as the data age is shown.
-- The budget figure comes from settings. Reading budgets defined in the cloud account is a possible
-  enhancement and is not required.
+- The budget comes **only** from budgets defined on the billing account in Google Cloud. It is read,
+  never written. There is no budget setting in CloudBar.
 - **"Monitored"** is judged per **resource type** within a project. A Cloud Run policy or uptime
   check covers every Cloud Run service in that project; a Cloud SQL policy covers every Cloud SQL
   instance. Matching individual resources to policies is not attempted in the MVP.
