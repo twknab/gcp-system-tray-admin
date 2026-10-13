@@ -10,6 +10,15 @@
 single owner of a personal set of Google Cloud projects one glanceable, trustworthy view of their
 environment — spend, what's running, alerts, overall status — strictly read-only."
 
+## Clarifications
+
+### Session 2026-10-13
+
+- Q: What counts as "monitored" for a resource? → A: Per resource type within a project. A
+  policy for a type covers all resources of that type in the project. The menu leads with
+  resources grouped by service type, each labelled with its project. A view organised by project
+  comes later.
+
 ## User Scenarios & Testing *(mandatory)*
 
 ### User Story 1 - See this month's spend and overall status at a glance (Priority: P1)
@@ -51,40 +60,49 @@ data age.
 
 ---
 
-### User Story 2 - Browse projects and what is running in each (Priority: P1)
+### User Story 2 - See everything I'm using, with its status and project (Priority: P1)
 
-The owner opens the menu and sees every Google Cloud project they can access, each with a status
-marker. Hovering a project opens a submenu with:
+The owner opens the menu and sees the things they actually run, grouped by kind of service:
 
-- the project's Cloud Run services and their state
-- its Cloud SQL instances and their state
-- its Vertex AI endpoints
-- how many APIs it has enabled
-- a link to the project's page in the Cloud Console
+- Cloud Run services
+- Cloud SQL instances
+- Vertex AI endpoints
+
+Each item shows its name, a status marker, and the project it belongs to. Hovering an item opens a
+small submenu with its state, location, project, and a link to its page in the Cloud Console. Each
+group header shows how many items it holds and the worst status among them.
+
+A view organised by project, with every resource listed under its project, is a later enhancement.
+The MVP leads with services because the owner's question is "is the stuff I use OK?", and project
+is shown as a label on each item.
 
 **Why this priority**: this is the second half of the "one view" promise. It replaces opening the
-console project by project.
+console service by service and project by project.
 
-**Independent Test**: use an account with at least two projects, one of which has a Cloud Run
-service. Every accessible project is listed, the Cloud Run service appears under the right project
-with its state, and each console link opens the matching page.
+**Independent Test**: use an account with two projects, one with a Cloud Run service and one with
+a Cloud SQL instance. Each resource appears under its service group with its state and its
+project's display name, and each console link opens the matching page.
 
 **Acceptance Scenarios**:
 
-1. **Given** the owner can access N projects, **When** they open the Projects section, **Then** the
-   section header shows the count N and each project appears once, by its display name, with a
-   status marker.
-2. **Given** a project has Cloud Run services, Cloud SQL instances, or Vertex AI endpoints, **When**
-   the owner opens that project's submenu, **Then** each resource appears under its own heading with
-   its current state, and clicking a resource opens its page in the Cloud Console.
-3. **Given** a project has none of a resource type, **When** its submenu opens, **Then** that
-   heading is either left out or shows a count of 0, and never shows an error.
-4. **Given** a resource type cannot be read in a project (the service is not enabled, or permission
-   is denied), **When** the submenu opens, **Then** that heading is marked unavailable with a
-   plain-language reason ("Cloud SQL API not enabled") and the rest of the submenu displays
-   normally.
+1. **Given** the owner has resources across several projects, **When** they open the menu, **Then**
+   resources are grouped by service type (Cloud Run, Cloud SQL, Vertex AI). Each group header
+   shows a count and the group's worst status. Each item shows its name, status marker, and project
+   display name.
+2. **Given** a resource is listed, **When** the owner hovers it, **Then** a submenu shows its
+   reported state, location, project, status reason, and a link that opens it in the Cloud Console.
+3. **Given** no project has a given resource type, **When** the menu renders, **Then** that group
+   is left out entirely, and no error is shown.
+4. **Given** a resource type cannot be read in some project (the service is not enabled, or
+   permission is denied), **When** the menu renders, **Then** that group lists everything it could
+   read, plus one line such as "Unavailable in 2 projects" whose submenu names each project and
+   reason. The rest of the menu displays normally.
 5. **Given** Vertex AI regions are configured (default `us-central1`), **When** endpoints are
-   listed, **Then** only those regions are checked, and the submenu says which regions were checked.
+   listed, **Then** only those regions are checked, and the Vertex AI group says which regions
+   were checked.
+6. **Given** the owner can access N projects, **When** they open the menu, **Then** a single
+   "Projects (N)" line is shown. Its submenu lists each project with a console link and its count
+   of enabled APIs. This is a reference list, not the project view deferred above.
 
 ---
 
@@ -105,11 +123,14 @@ degraded, and down respectively.
 
 **Acceptance Scenarios**:
 
-1. **Given** a resource reports ready or running and its project has active monitoring with no open
-   alert, **When** status is computed, **Then** the resource is **healthy**.
-2. **Given** a resource reports ready or running but its project has no active alert policy or
-   uptime check, **When** status is computed, **Then** the resource is **unknown (not monitored)**,
-   never healthy, and its line says "not monitored".
+1. **Given** a resource reports ready or running, and its project has an active alert policy or
+   uptime check covering that resource's **type** (for example, any Cloud Run policy for a Cloud
+   Run service), with no open alert, **When** status is computed, **Then** the resource is
+   **healthy**.
+2. **Given** a resource reports ready or running, but its project has no active alert policy or
+   uptime check covering that resource's type, **When** status is computed, **Then** the resource
+   is **unknown (not monitored)**, never healthy, and its line says "not monitored". This holds
+   even if the project monitors other resource types.
 3. **Given** a resource's newest deployment failed while an older version still serves, or an alert
    at warning level is open, **When** status is computed, **Then** the resource or project is
    **degraded**.
@@ -119,9 +140,9 @@ degraded, and down respectively.
    its name, project, severity, and how long it has been open, and links to the Cloud Console.
 6. **Given** no alerts are open, **When** the owner opens the Alerts section, **Then** it reads "No
    open alerts", followed by the number of alert policies across the listed projects.
-7. **Given** any mix of project statuses, **When** the overall status is computed, **Then** it is
-   the worst status among the listed projects, with one exception: if every project is unknown, the
-   overall status is unknown, not healthy.
+7. **Given** any mix of resource statuses, **When** the overall status is computed, **Then** it is
+   the worst status among the listed resources and billing, with one exception: if every resource
+   is unknown, the overall status is unknown, not healthy.
 
 ---
 
@@ -176,8 +197,9 @@ the cloud environment changes.
   minimal state: indicator, unknown status, and setup check.
 - **Credentials expired mid-month:** the status is unknown, the title omits the amount or marks it
   stale, and the setup check names the sign-in step.
-- **Many projects:** the list stays usable. Projects are sorted with the worst status first, then
-  by name. The owner can exclude projects in settings.
+- **Many resources or projects:** within each service group, items are sorted worst status
+  first, then by project, then by name. The owner can exclude projects in settings.
+- **Same resource name in two projects:** both are listed. The project label tells them apart.
 - **Archived projects or projects with billing disabled:** shown as unknown with the reason
   "billing disabled", or left out if pending deletion.
 - **Start of the month:** month-to-date may legitimately be $0.00 or not yet reported. Show the
@@ -214,22 +236,22 @@ the cloud environment changes.
 
 **Projects and resources**
 
-- **FR-006**: The menu MUST list every project the owner can access, minus any excluded in
-  settings. Each project shows its display name, a status marker, and a submenu.
-- **FR-007**: Each project submenu MUST show:
-  - Cloud Run services with their state
-  - Cloud SQL instances with their state
-  - Vertex AI endpoints in the configured regions
-  - the count of enabled APIs
-  - a link to the project in the Cloud Console
-- **FR-008**: A totals line MUST summarise counts across projects: Cloud Run services, Cloud SQL
-  instances, and Vertex AI endpoints.
+- **FR-006**: The menu MUST group resources by service type: Cloud Run services, Cloud SQL
+  instances, and Vertex AI endpoints in the configured regions. Each group header shows its count
+  and its worst status. Each item shows its name, status marker, and project display name.
+  Projects excluded in settings are left out. Groups with no items are omitted.
+- **FR-007**: Each resource's submenu MUST show its reported state, location, project, status
+  reason, and a link to its page in the Cloud Console.
+- **FR-008**: The menu MUST include a "Projects (N)" reference line. Its submenu lists each
+  accessible project with a console link and its count of enabled APIs. A view that lists each
+  project's resources beneath it is deferred to a later feature.
 
 **Status and alerts**
 
-- **FR-009**: Status MUST be computed by the rules in User Story 3. A resource or project is
-  **healthy** only with positive evidence: a ready or running state, active monitoring, and no
-  open alert. Deployed or enabled without monitoring MUST be **unknown**.
+- **FR-009**: Status MUST be computed by the rules in User Story 3. A resource is **healthy**
+  only with positive evidence: a ready or running state, plus an active alert policy or uptime
+  check in its project covering its **resource type**, and no open alert. Deployed or enabled
+  without monitoring of its type MUST be **unknown**.
 - **FR-010**: The Alerts section MUST list open alerts with name, project, severity, age, and a
   console link. With none open, it shows "No open alerts" and the count of alert policies.
 
@@ -281,9 +303,10 @@ the cloud environment changes.
 ### Key Entities
 
 - **Project**: a Google Cloud project the owner can access, with a display name, an identifier,
-  whether billing is enabled, the count of enabled APIs, a computed status, and the resources in it.
+  whether billing is enabled, and the count of enabled APIs. In the MVP it appears as a label on
+  each resource and in the Projects reference list.
 - **Resource**: a Cloud Run service, Cloud SQL instance, or Vertex AI endpoint, with a type, name,
-  location, reported state, computed status, and console link.
+  location, owning project, reported state, computed status with reason, and console link.
 - **Billing summary**: month-to-date net spend, last month's net spend, currency, budget, remaining
   amount, and the time the data was last updated. It may instead be unavailable, with a reason.
 - **Alert**: an open monitoring incident or alert, with a name, project, severity, opened time, and
@@ -327,8 +350,9 @@ the cloud environment changes.
 - Cost data lags real usage by hours. That lag is acceptable as long as the data age is shown.
 - The budget figure comes from settings. Reading budgets defined in the cloud account is a possible
   enhancement and is not required.
-- **"Monitored"** means the project has at least one enabled alert policy or uptime check. The MVP
-  works at project level, not per resource.
+- **"Monitored"** is judged per **resource type** within a project. A Cloud Run policy or uptime
+  check covers every Cloud Run service in that project; a Cloud SQL policy covers every Cloud SQL
+  instance. Matching individual resources to policies is not attempted in the MVP.
 - Vertex AI is checked only in the configured regions, defaulting to `us-central1`.
 - **Out of scope:**
   - spend forecasts
@@ -338,3 +362,4 @@ the cloud environment changes.
   - any write actions (start, stop, deploy, enable)
   - resource types other than Cloud Run, Cloud SQL, and Vertex AI endpoints
   - Cloud Storage bucket counts and other extra totals from the original mockup
+  - a view that lists each project's resources beneath it (planned as a follow-up feature)
