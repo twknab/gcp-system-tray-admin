@@ -23,6 +23,8 @@ environment — spend, what's running, alerts, overall status — strictly read-
   budget setting.
 - Q: Which billing accounts count towards spend? → A: Every billing account visible to the owner's
   sign-in. Totals are per currency. Any account whose costs can't be read makes the total "partial".
+- Q: When is cost data stale? → A: After 24 hours. Stale data gets a label on the spend figures
+  only, and the overall status is unaffected.
 
 ## User Scenarios & Testing *(mandatory)*
 
@@ -220,8 +222,9 @@ the cloud environment changes.
 - **Budgets cannot be read** (missing permission or API not enabled): the budget lines show
   "Unavailable" with the reason, and the setup check names the fix. Spend still displays.
 - **Credits exceed charges:** net spend can be negative or zero. It is shown as reported.
-- **Cost data lag:** the data age is always visible. Cost data more than 48 hours old is labelled
-  stale.
+- **Cost data lag:** the data age is always visible. Cost data more than **24 hours** old is
+  labelled stale on the spend figures. Stale cost data does **not** change the overall status,
+  which reflects only whether services are working.
 - **Two refreshes overlap** (scheduled and manual): only one fetch runs, and the other uses its
   result.
 - **More than one billing account:** the header total covers **every** billing account the owner's
@@ -304,8 +307,14 @@ the cloud environment changes.
 - **FR-014**: When any single source fails, times out, or is denied, the menu MUST still render
   everything else. That item shows "unavailable" with a reason, plus its last good data and age if
   any exists.
-- **FR-015**: The menu MUST display when it was last updated. Any figure older than its freshness
-  window MUST be marked stale.
+- **FR-015**: The menu MUST display when it was last updated. A figure MUST be marked stale in
+  either of two cases:
+  - its last successful fetch is older than its freshness window, for example because refreshes
+    keep failing;
+  - for spend only, the cost data itself is more than 24 hours old, even if it was fetched just
+    now.
+
+  Staleness never changes the overall status.
 
 **Read-only and cost safety**
 

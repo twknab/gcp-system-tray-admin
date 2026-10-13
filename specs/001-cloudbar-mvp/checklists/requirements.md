@@ -37,5 +37,5 @@
 - Choices made by default, and recorded under Assumptions:
   - "monitored" is judged per project, not per resource
   - the budget comes from settings
-  - cost data older than 48 hours is labelled stale
+  - cost data older than 24 hours is labelled stale (settled in clarify)
 - These are good candidates for `/speckit-clarify`.
