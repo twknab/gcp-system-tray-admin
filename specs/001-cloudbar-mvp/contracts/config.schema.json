@@ -1,0 +1,59 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://github.com/twknab/gcp-system-tray-admin/config.schema.json",
+  "title": "CloudBar config (~/.config/cloudbar/config.json)",
+  "type": "object",
+  "additionalProperties": false,
+  "properties": {
+    "billingExports": {
+      "description": "Billing account ID → fully-qualified BigQuery standard usage cost export table. Accounts not listed are auto-discovered if possible, else reported as 'Costs unavailable'.",
+      "type": "object",
+      "propertyNames": { "pattern": "^[0-9A-F]{6}-[0-9A-F]{6}-[0-9A-F]{6}$" },
+      "additionalProperties": {
+        "type": "string",
+        "pattern": "^[a-z][a-z0-9-]{4,28}[a-z0-9]\\.[A-Za-z0-9_]+\\.gcp_billing_export_v1_[0-9A-F_]+$"
+      },
+      "default": {}
+    },
+    "vertexRegions": {
+      "type": "array",
+      "items": { "type": "string", "pattern": "^[a-z]+-[a-z]+[0-9]$" },
+      "minItems": 1,
+      "default": ["us-central1"]
+    },
+    "excludeProjects": {
+      "type": "array",
+      "items": { "type": "string" },
+      "default": []
+    },
+    "quotaProject": {
+      "description": "Project used for x-goog-user-project and as the BigQuery job project. Defaults to the ADC quota project, then the export table's project.",
+      "type": "string"
+    },
+    "maxBytesBilled": {
+      "description": "Hard cap per BigQuery job, bytes. Default 1 GiB.",
+      "type": "integer",
+      "minimum": 10485760,
+      "maximum": 10737418240,
+      "default": 1073741824
+    },
+    "ttlOverrides": {
+      "description": "Seconds. Defaults: alerts 300, resources 900, projects 3600, services 3600, costs 14400, budgets 14400, storageSize 21600.",
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "alerts": { "type": "integer", "minimum": 60 },
+        "resources": { "type": "integer", "minimum": 60 },
+        "projects": { "type": "integer", "minimum": 300 },
+        "services": { "type": "integer", "minimum": 300 },
+        "costs": { "type": "integer", "minimum": 900 },
+        "budgets": { "type": "integer", "minimum": 900 },
+        "storageSize": { "type": "integer", "minimum": 900 }
+      }
+    },
+    "nodePath": {
+      "description": "Absolute path to node for the SwiftBar shim, if not found on the default search path.",
+      "type": "string"
+    }
+  }
+}
