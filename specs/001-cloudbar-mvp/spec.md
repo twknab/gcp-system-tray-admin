@@ -21,6 +21,8 @@ environment — spend, what's running, alerts, overall status — strictly read-
 - Q: Where does the monthly budget come from? → A: Only from the budgets defined on the billing
   account in Google Cloud. If none exist, CloudBar shows "No budget set". There is no local
   budget setting.
+- Q: Which billing accounts count towards spend? → A: Every billing account visible to the owner's
+  sign-in. Totals are per currency. Any account whose costs can't be read makes the total "partial".
 
 ## User Scenarios & Testing *(mandatory)*
 
@@ -190,7 +192,7 @@ the cloud environment changes.
 4. **Given** the owner chooses Refresh, **When** the menu re-renders, **Then** every source is
    fetched fresh regardless of how old the cached data is, and the "Updated" time resets.
 5. **Given** the owner chooses Settings, **When** it opens, **Then** they can edit:
-   - the cost-data location
+   - the cost-data location for each billing account
    - the Vertex AI regions
    - projects to exclude
 
@@ -222,8 +224,13 @@ the cloud environment changes.
   stale.
 - **Two refreshes overlap** (scheduled and manual): only one fetch runs, and the other uses its
   result.
-- **More than one billing account:** spend is summed per currency. If currencies differ, each is
-  shown separately rather than added.
+- **More than one billing account:** the header total covers **every** billing account the owner's
+  sign-in can see. Amounts are summed per currency; if currencies differ, each is shown separately
+  rather than added. The billing summary has a submenu listing each account's month-to-date and
+  last-month spend, and its budget.
+- **Some billing accounts have no cost export:** accounts without readable cost data are listed as
+  "Costs unavailable" with the reason. The total covers only the accounts that could be read, and
+  is labelled "partial (2 of 3 accounts)" so it is never mistaken for the full figure.
 - **Very long resource names:** truncated in the menu, with the full name available in the
   tooltip.
 
@@ -242,6 +249,9 @@ the cloud environment changes.
 
 - **FR-003**: The billing summary MUST show month-to-date net spend, last month's total, the
   monthly budget, the remaining amount (or overspend), and when the cost data was last updated.
+- **FR-022**: Spend totals MUST cover every billing account visible to the owner's sign-in, not
+  only the accounts linked to listed projects. A total that omits any visible account MUST be
+  labelled partial and name how many accounts it covers.
 - **FR-004**: Spend figures MUST come from the account's exported billing cost data, and MUST NOT
   be estimated from resource lists or prices.
 - **FR-005**: When the cost export is not available, the billing section MUST say "Costs
@@ -310,7 +320,7 @@ the cloud environment changes.
 - **FR-018**: CloudBar MUST use the owner's existing Google Cloud sign-in on the machine. It MUST
   NOT ask for, store, or ship credentials or keys of its own.
 - **FR-019**: Settings MUST be stored on the owner's machine outside the code repository:
-  - cost-data location
+  - cost-data location for each billing account
   - Vertex AI regions (default `us-central1`)
   - excluded projects
 - **FR-020**: Status MUST be conveyed by both colour and symbol shape or text, so it is readable
@@ -323,14 +333,16 @@ the cloud environment changes.
   each resource and in the Projects reference list.
 - **Resource**: a Cloud Run service, Cloud SQL instance, or Vertex AI endpoint, with a type, name,
   location, owning project, reported state, computed status with reason, and console link.
-- **Billing summary**: month-to-date net spend, last month's net spend, currency, budget, remaining
+- **Billing account**: an account visible to the owner, with its name, currency, its own spend
+  figures, its budgets, and whether its cost data is readable.
+- **Billing summary**: totals across all visible billing accounts. Month-to-date net spend, last month's net spend, currency, budget, remaining
   amount, and the time the data was last updated. It may instead be unavailable, with a reason.
 - **Alert**: an open monitoring incident or alert, with a name, project, severity, opened time, and
   console link. The count of alert policies is kept alongside.
 - **Status**: one of healthy, degraded, down, or unknown, with an optional short reason.
 - **Source result**: for each kind of data, the value or the failure reason, when it was fetched,
   and whether it is stale.
-- **Settings**: cost-data location, Vertex AI regions, and excluded projects.
+- **Settings**: cost-data location per billing account, Vertex AI regions, and excluded projects.
 - **Setup finding**: one checked item with pass, warning, or fail, a plain-language explanation,
   and a next step.
 
