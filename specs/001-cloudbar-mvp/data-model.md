@@ -69,10 +69,12 @@ state is not `ACTIVE` are dropped too.
 
 | Type | Ready | Degraded | Down |
 |------|-------|----------|------|
-| run | `terminalCondition.state = CONDITION_SUCCEEDED`, and latestReady == latestCreated | latestCreated ≠ latestReady with the latest revision failed, or `reconciling` for more than 15 minutes | `terminalCondition.state = CONDITION_FAILED` and no ready revision |
-| sql | `state = RUNNABLE` | `MAINTENANCE` | `FAILED`, or `SUSPENDED` |
-| sql (stopped by owner) | `activationPolicy = NEVER` → status `unknown`, reason "stopped" | | |
-| vertex | the endpoint exists with at least one deployed model | the endpoint has 0 deployed models | n/a |
+| run | Ready=True, and latestReady == latestCreated | Ready=False, with latestReady non-empty and ≠ latestCreated | Ready=False, with no ready revision |
+| run (Ready=Unknown) | → `unknown`, reason "deploying" | | |
+| sql | `RUNNABLE` with activationPolicy `ALWAYS` | `MAINTENANCE`, `REPAIRING` | `FAILED`, `SUSPENDED` |
+| sql (other) | `RUNNABLE` with `NEVER` → `unknown`, reason "stopped". `PENDING_*` → `unknown`, reason "provisioning" or "deleting". | | |
+| vertex | the endpoint has at least one deployed model | n/a | n/a |
+| vertex (idle) | 0 deployed models → `unknown`, reason "idle, no models deployed" | | |
 | storage | never "ready", always unknown (Story 3 #8) | | |
 
 **Status rule** (FR-009): when the resource's mapped state is **Ready**:
@@ -87,8 +89,9 @@ the alert level wins.
 ## MonitoringCoverage
 
 `Set<\`${projectId}:${type}\`>`, built from enabled alert policies and uptime checks. A policy's
-condition filters (MQL or PromQL text) are mapped to a resource type through the monitored-resource
-names in `research.md` R3. A policy whose resource type can't be determined covers nothing.
+condition filters (threshold or absence filters, MQL, PromQL) are mapped to a resource type through the
+monitored-resource names in `research.md` R3. An uptime check targeting `cloud_run_revision`
+covers `run`. A policy whose resource type can't be determined covers nothing.
 
 ## Alert
 
@@ -103,7 +106,8 @@ names in `research.md` R3. A policy whose resource type can't be determined cove
 | consoleUrl | string |
 
 How severity maps to status: `critical` and `error` mean down; `warning` and `unspecified` mean
-degraded.
+degraded. The source is `GET v3/projects/{p}/alerts?filter=state="OPEN"`, with severity taken from
+the `policy` snapshot and `resourceType` from `resource.type` (research R1).
 
 ## BillingAccount
 
@@ -113,7 +117,7 @@ degraded.
 | displayName | string | |
 | open | boolean | closed accounts are listed but excluded from totals |
 | currency | string \| null | from export rows |
-| exportTable? | string | `project.dataset.table`, from config or found by discovery |
+| exportTable? | string | `project.dataset.table`, required in config. Missing → "Costs unavailable: export not configured". |
 | costs | SourceResult\<{ mtdMinor: number; lastMonthMinor: number \| null; exportTime: string }\> | |
 | budgets | SourceResult\<Budget[]\> | |
 
@@ -159,6 +163,8 @@ interface Snapshot {
 See `contracts/config.schema.json`. The fields are:
 
 - `billingExports` — a map of `accountId` to `project.dataset.table`.
+- `runRegions` — the fallback regions if the global Cloud Run list is unavailable. Defaults to
+  `["us-central1"]`.
 - `vertexRegions` — defaults to `["us-central1"]`.
 - `excludeProjects` — defaults to `[]`.
 - `quotaProject` — optional.

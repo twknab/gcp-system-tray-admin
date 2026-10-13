@@ -55,7 +55,7 @@ What each fixture must render, checked against `contracts/swiftbar-output.md`:
 ## C. Read-only and cost checks (SC-006)
 
 - `npm test` includes `http.guard.test.ts`, which proves every request the code can make uses `GET`.
-  The only exceptions are reads by `POST`: BigQuery queries and Monitoring time-series queries.
+  The only exception is a read made by `POST`: BigQuery `SELECT` queries.
 - After a week of use, the BigQuery console's "Job history" for the quota project should show only
   `SELECT` jobs, each under the configured byte cap.
 - The Cloud audit log for the account should show no admin-write activity from the owner's

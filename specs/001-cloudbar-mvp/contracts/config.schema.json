@@ -6,7 +6,7 @@
   "additionalProperties": false,
   "properties": {
     "billingExports": {
-      "description": "Billing account ID → fully-qualified BigQuery standard usage cost export table. Accounts not listed are auto-discovered if possible, else reported as 'Costs unavailable'.",
+      "description": "Billing account ID → fully-qualified BigQuery standard usage cost export table. Accounts not listed are reported as 'Costs unavailable — export not configured'.",
       "type": "object",
       "propertyNames": { "pattern": "^[0-9A-F]{6}-[0-9A-F]{6}-[0-9A-F]{6}$" },
       "additionalProperties": {
@@ -19,6 +19,12 @@
       "type": "array",
       "items": { "type": "string", "pattern": "^[a-z]+-[a-z]+[0-9]$" },
       "minItems": 1,
+      "default": ["us-central1"]
+    },
+    "runRegions": {
+      "description": "Fallback regions for Cloud Run if the global v1 list is unavailable.",
+      "type": "array",
+      "items": { "type": "string", "pattern": "^[a-z]+-[a-z]+[0-9]$" },
       "default": ["us-central1"]
     },
     "excludeProjects": {

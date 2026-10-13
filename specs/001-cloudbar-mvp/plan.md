@@ -77,7 +77,7 @@ macOS with Node 22.
 
 | Principle | Gate | Pre-design | Post-design |
 |-----------|------|------------|-------------|
-| I. Read-only & No New Cost | Only `GET`/`list` calls, plus BigQuery `jobs.query` with `maximumBytesBilled` and a partition filter. No `enable`, `create`, `patch`, or `delete` anywhere. | ✅ | ✅ The HTTP client allows `GET`; `POST` only to `bigquery…/queries` and `monitoring…/timeSeries:query`, both reads. Enforced by a unit test. |
+| I. Read-only & No New Cost | Only `GET`/`list` calls, plus BigQuery `jobs.query` with `maximumBytesBilled` and a partition filter. No `enable`, `create`, `patch`, or `delete` anywhere. | ✅ | ✅ The HTTP client allows `GET`; the only `POST` it permits is to `bigquery…/projects/*/queries`, a read-only `SELECT` with a dry-run check first. Enforced by a unit test. |
 | II. Honest Status | Healthy needs a ready state, plus monitoring covering the resource type, plus no open alert. Buckets are never healthy. Every figure carries an `asOf`. | ✅ | ✅ `model/status.ts` is pure and fully table-tested against FR-009 and Story 3. |
 | III. Graceful Degradation | One source's failure never blanks the menu. | ✅ | ✅ Each source returns a `SourceResult<T>` (ok, error, or stale). Rendering takes the union. |
 | IV. Lightweight & Testable | One runtime dependency. Pure model and render layers. | ✅ | ✅ |
@@ -123,11 +123,11 @@ src/
 │   ├── billingAccounts.ts# Cloud Billing: accounts + project billing info
 │   ├── costs.ts          # BigQuery export query (MTD, last month, exportTime)
 │   ├── budgets.ts        # Budget API read
-│   ├── run.ts            # Cloud Run v2 services
+│   ├── run.ts            # Cloud Run v1 global list (v2 per-region fallback)
 │   ├── sql.ts            # Cloud SQL Admin instances
 │   ├── vertex.ts         # Vertex AI endpoints per configured region
 │   ├── storage.ts        # buckets.list + total_bytes metric
-│   └── monitoring.ts     # alert policies, uptime checks, open alerts
+│   └── monitoring.ts     # v3 alerts (state=OPEN), alert policies, uptime checks → coverage
 ├── model/
 │   ├── types.ts          # Snapshot, Resource, Status, SourceResult, …
 │   ├── status.ts         # PURE: resource/group/overall status rules
@@ -181,6 +181,22 @@ network and are impure), **model** (pure), and **render** (pure). Only `sources/
      red, `questionmark.circle` grey.
 7. **The setup check, `doctor`, reuses the same sources.** It runs each one once and turns every
    failure into a plain-English finding with a next step. It never enables anything (Story 4).
+
+## Research outcomes that changed the design
+
+See `research.md`.
+
+- **R1:** a public API for open alerts exists, so alert status no longer depends on a fallback.
+- **R4:** the Cloud Run v2 list rejects the `-` location wildcard. CloudBar uses the v1 global
+  endpoint, with v2 per region as the fallback.
+- **R5:** Cloud SQL has no `STOPPED` state. Stopped means `RUNNABLE` plus `activationPolicy=NEVER`.
+- **R10:** export tables must be named in config. CloudBar does not discover them. It also runs a
+  dry run before the first real query.
+- **R13:** with user credentials, every request carries `x-goog-user-project`, and the setup check
+  validates the quota project.
+
+Items marked "verify in implement" in research.md each get a task: capture a real fixture
+and confirm.
 
 ## Complexity Tracking
 
