@@ -483,7 +483,7 @@ Also: buckets are unknown or alert-driven only, and the overall status follows t
 
 ### Tests for US3
 
-- [ ] T069 [P] [US3] Write `tests/sources/monitoring.test.ts`:
+- [X] T069 [P] [US3] Write `tests/sources/monitoring.test.ts`:
   - policy parsing for each condition kind (threshold, absent, MQL `fetch`, PromQL
     `monitored_resource` and metric prefix) mapped to resource types (R3 table);
   - disabled policies are ignored;
@@ -493,33 +493,33 @@ Also: buckets are unknown or alert-driven only, and the overall status follows t
   - pagination;
   - an alerts call that fails while the policies call succeeds gives "Alerts unavailable" with
     the policy count still shown.
-- [ ] T070 [P] [US3] Write `tests/unit/status.matrix.test.ts`: a table test for spec Story 3 #1–8,
+- [X] T070 [P] [US3] Write `tests/unit/status.matrix.test.ts`: a table test for spec Story 3 #1–8,
   plus overall precedence:
   - all unknown → unknown;
   - one healthy plus unknowns → healthy;
   - any degraded → degraded;
   - any down → down;
   - over budget → at least degraded.
-- [ ] T071 [P] [US3] Write `tests/render/alerts.test.ts` with snapshots for fixtures
+- [X] T071 [P] [US3] Write `tests/render/alerts.test.ts` with snapshots for fixtures
   `status-matrix`, `alerts-open` (one critical, one warning, with ages and links), and
   `alerts-none` ("No open alerts · N policies").
 
 ### Implementation for US3
 
-- [ ] T072 [US3] Implement `src/sources/monitoring.ts`: `listAlertPolicies(p)`,
+- [X] T072 [US3] Implement `src/sources/monitoring.ts`: `listAlertPolicies(p)`,
   `listUptimeChecks(p)`, then `coverage: Set<'<p>:<type>'>`, and `listOpenAlerts(p)`, then
   `Alert[]` (research R1–R3).
-- [ ] T073 [US3] Feed coverage and alerts into `resourceStatus` in `src/model/status.ts`:
+- [X] T073 [US3] Feed coverage and alerts into `resourceStatus` in `src/model/status.ts`:
   - an open alert matching the project and type sets the level, with critical or error as down and
     warning as degraded, and the worse of state and alert wins;
   - storage gets degraded or down only through an alert (Story 3 #8).
-- [ ] T074 [US3] Extend `src/model/view.ts` and `src/render/swiftbar.ts` with the Alerts section:
+- [X] T074 [US3] Extend `src/model/view.ts` and `src/render/swiftbar.ts` with the Alerts section:
   one line per alert, with severity symbol, policy name, project, and age, linking to
   `https://console.cloud.google.com/monitoring/alerting/alerts/<id>?project=<p>`, or "No open
   alerts · N policies".
-- [ ] T075 [US3] Register `alerts:<p>` (5 min), `alertPolicies:<p>` (1 h), and `uptime:<p>` (1 h)
+- [X] T075 [US3] Register `alerts:<p>` (5 min), `alertPolicies:<p>` (1 h), and `uptime:<p>` (1 h)
   in `src/refresh.ts`, skipped without a call when `monitoring.googleapis.com` is not enabled.
-- [ ] T076 [P] [US3] Create fixtures `tests/fixtures/{status-matrix,alerts-open,alerts-none}.json`
+- [X] T076 [P] [US3] Create fixtures `tests/fixtures/{status-matrix,alerts-open,alerts-none}.json`
   with fake IDs.
 
 **Checkpoint**: all four stories work. Status meets Principle II.

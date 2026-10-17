@@ -145,6 +145,84 @@ denied['sql:fake-alpha'] = fail('denied', 'permission denied: cloudsql.instances
 denied['run:fake-beta'] = fail('network', 'network error: fetch failed', { data: { resources: [res('run', 'fake-beta', 'us-central1', 'site', 'Ready=True · site-00003-abc', READY)] }, fetchedAt: at(2) });
 fixtures.denied = { config: { billingExports: { [A]: TABLE(A) } }, snapshot: snap(denied) };
 
+// ---------- US3 status & alerts ----------
+const policies = (n, types) => ok({ policyCount: n, coveredTypes: types });
+const uptime = (types = []) => ok({ coveredTypes: types, count: types.length });
+const alert = (id, projectId, policyName, severity, hoursOpen, resourceType, resourceName) => ({
+  id, policyName, projectId, severity, openedAt: at(hoursOpen),
+  ...(resourceType ? { resourceType } : {}), ...(resourceName ? { resourceName } : {}),
+  consoleUrl: `https://console.cloud.google.com/monitoring/alerting/alerts/${id}?project=${projectId}`,
+});
+const MATRIX_PROJECTS = [
+  { projectId: 'fake-alpha', displayName: 'Alpha', projectNumber: '123456789012' },
+  { projectId: 'fake-beta', displayName: 'Beta', projectNumber: '223456789012' },
+  { projectId: 'fake-gamma', displayName: 'Gamma', projectNumber: '423456789012' },
+];
+function matrixSources() {
+  const base = {
+    billingAccounts: ok([acct(A, 'Personal')]),
+    [`costs:${A}`]: ok(costs(2482, 3145)),
+    [`budgets:${A}`]: ok([budget('Monthly cap', 5000)]),
+    projects: ok(MATRIX_PROJECTS),
+  };
+  for (const p of MATRIX_PROJECTS) {
+    base[`services:${p.projectId}`] = ok(svc(['run.googleapis.com', 'storage.googleapis.com', 'monitoring.googleapis.com']));
+    base[`billingInfo:${p.projectId}`] = ok({ billingEnabled: true, billingAccountId: A });
+    base[`sql:${p.projectId}`] = fail('disabled', 'Cloud SQL Admin API not enabled');
+    base[`vertex:${p.projectId}:us-central1`] = fail('disabled', 'Vertex AI API not enabled');
+    base[`storageSize:${p.projectId}`] = ok({ sizes: { [`${p.projectId}-data`]: 2_000_000_000 }, asOf: at(5) });
+    base[`storage:${p.projectId}`] = ok({ resources: [bucket(p.projectId, `${p.projectId}-data`)] });
+    base[`uptime:${p.projectId}`] = uptime();
+  }
+  base['run:fake-alpha'] = ok({ resources: [
+    res('run', 'fake-alpha', 'us-central1', 'api', 'Ready=True · api-00042-xyz', READY),
+    res('run', 'fake-alpha', 'us-central1', 'worker', 'Ready=False · worker-00007-aaa', { kind: 'degraded', reason: 'latest revision failed, previous still serving' }),
+  ] });
+  base['run:fake-beta'] = ok({ resources: [res('run', 'fake-beta', 'us-central1', 'site', 'Ready=True · site-00003-abc', READY)] });
+  base['run:fake-gamma'] = ok({ resources: [res('run', 'fake-gamma', 'us-central1', 'checkout', 'Ready=True · checkout-00010-abc', READY)] });
+  base['alertPolicies:fake-alpha'] = policies(3, ['run']);
+  base['alertPolicies:fake-beta'] = policies(0, []);
+  base['alertPolicies:fake-gamma'] = policies(2, ['run', 'storage']);
+  base['alerts:fake-alpha'] = ok([]);
+  base['alerts:fake-beta'] = ok([]);
+  base['alerts:fake-gamma'] = ok([
+    alert('a1', 'fake-gamma', 'Checkout 5xx rate', 'critical', 0.5, 'run', 'checkout'),
+    alert('a2', 'fake-gamma', 'Bucket egress spike', 'warning', 26, 'storage', 'fake-gamma-data'),
+  ]);
+  return base;
+}
+fixtures['status-matrix'] = { config: { billingExports: { [A]: TABLE(A) } }, snapshot: snap(matrixSources()) };
+
+const open = matrixSources();
+open['alerts:fake-alpha'] = ok([alert('b1', 'fake-alpha', 'API latency high', 'warning', 3, 'run', 'api')]);
+fixtures['alerts-open'] = { config: { billingExports: { [A]: TABLE(A) } }, snapshot: snap(open) };
+
+const none = matrixSources();
+none['alerts:fake-gamma'] = ok([]);
+none['alertPolicies:fake-beta'] = policies(2, ['storage']);
+fixtures['alerts-none'] = { config: { billingExports: { [A]: TABLE(A) } }, snapshot: snap(none) };
+
+// quickstart §A fixtures
+const healthy = servicesSources();
+healthy['run:fake-alpha'] = ok({ resources: [res('run', 'fake-alpha', 'us-central1', 'api', 'Ready=True · api-00042-xyz', READY)] });
+for (const p of ['fake-alpha', 'fake-beta']) {
+  healthy[`alertPolicies:${p}`] = policies(3, ['run']);
+  healthy[`uptime:${p}`] = uptime(['run']);
+  healthy[`alerts:${p}`] = ok([]);
+}
+for (const k of ['alerts', 'alertPolicies', 'uptime']) healthy[`${k}:fake-sandbox`] = fail('disabled', 'Cloud Monitoring API not enabled');
+fixtures.healthy = { config: { billingExports: { [A]: TABLE(A) } }, snapshot: snap(healthy) };
+
+const degraded = servicesSources();
+for (const p of ['fake-alpha', 'fake-beta']) {
+  degraded[`alertPolicies:${p}`] = policies(3, ['run', 'sql']);
+  degraded[`uptime:${p}`] = uptime(['run']);
+  degraded[`alerts:${p}`] = ok([]);
+}
+degraded['alerts:fake-alpha'] = ok([alert('c1', 'fake-alpha', 'Worker queue backlog', 'warning', 2, 'run', 'worker')]);
+for (const k of ['alerts', 'alertPolicies', 'uptime']) degraded[`${k}:fake-sandbox`] = fail('disabled', 'Cloud Monitoring API not enabled');
+fixtures.degraded = { config: { billingExports: { [A]: TABLE(A) } }, snapshot: snap(degraded) };
+
 for (const [name, fx] of Object.entries(fixtures)) {
   writeFileSync(`${out}${name}.json`, JSON.stringify({ now: NOW, ...fx }, null, 2) + '\n');
 }

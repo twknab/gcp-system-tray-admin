@@ -1,6 +1,7 @@
 // PURE: Snapshot + Config → ViewModel. No I/O.
 import { buildBillingSummary } from './billing.js';
 import { findingsFromSnapshot } from './findings.js';
+import { buildMonitoring } from './alerts.js';
 import { buildServices } from './services.js';
 import { overallStatus } from './status.js';
 import { formatMoneyByCurrency } from '../render/format.js';
@@ -45,13 +46,14 @@ export function invoiceMonths(now: Date): { month: string; lastMonth: string } {
 export function buildView(snapshot: Snapshot, config: Config, now: Date, paths: ViewPaths, extra: { setupIssues?: ViewModel['setupIssues']; quotaProject?: string | undefined } = {}): ViewModel {
   const billing = buildBillingSummary(snapshot, config, now, invoiceMonths(now));
   const partial = billing.available && billing.coveredAccounts < billing.visibleAccounts;
-  const services = buildServices({ snapshot, config, now, coverage: new Set(), alerts: [] });
+  const monitoring = buildMonitoring(snapshot, config, now);
+  const services = buildServices({ snapshot, config, now, coverage: monitoring.coverage, alerts: monitoring.alerts });
   const view: ViewModel = {
-    overall: overallStatus(services.statuses, billing),
+    overall: overallStatus([...services.statuses, ...monitoring.alertStatuses], billing),
     titleAmount: billing.available ? `${partial ? '~' : ''}${formatMoneyByCurrency(billing.mtd)}` : null,
     billing,
     groups: services.groups,
-    alerts: null,
+    alerts: monitoring.view,
     projects: services.projects,
     setupIssues: [
       ...(extra.setupIssues ?? []),
