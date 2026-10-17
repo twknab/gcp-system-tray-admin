@@ -108,10 +108,13 @@ project's display name, and each console link opens the matching page.
    reported state, location, project, status reason, and a link that opens it in the Cloud Console.
 3. **Given** no project has a given resource type, **When** the menu renders, **Then** that group
    is left out entirely, and no error is shown.
-4. **Given** a resource type cannot be read in some project (the service is not enabled, or
-   permission is denied), **When** the menu renders, **Then** that group lists everything it could
+4. **Given** a resource type cannot be read in some project (permission is denied, or the
+   request failed), **When** the menu renders, **Then** that group lists everything it could
    read, plus one line such as "Unavailable in 2 projects" whose submenu names each project and
    reason. The rest of the menu displays normally.
+   A project where the service's API is **not enabled** cannot have any of those resources. It
+   counts as having none, and the setup check lists it as a note. Listing it as unavailable would
+   flag every project that simply doesn't use that service. *(Settled during implementation.)*
 5. **Given** Vertex AI regions are configured (default `us-central1`), **When** endpoints are
    listed, **Then** only those regions are checked, and the Vertex AI group says which regions
    were checked.

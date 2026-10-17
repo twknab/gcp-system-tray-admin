@@ -1,0 +1,399 @@
+{
+  "now": "2026-10-17T12:00:00Z",
+  "config": {
+    "billingExports": {
+      "000000-000000-000000": "example-project.billing.gcp_billing_export_v1_000000_000000_000000"
+    }
+  },
+  "snapshot": {
+    "schemaVersion": 1,
+    "updatedAt": "2026-10-17T11:57:00.000Z",
+    "sources": {
+      "billingAccounts": {
+        "ok": true,
+        "data": [
+          {
+            "id": "000000-000000-000000",
+            "displayName": "Personal",
+            "open": true,
+            "currencyCode": "USD"
+          }
+        ],
+        "fetchedAt": "2026-10-17T11:57:00.000Z"
+      },
+      "costs:000000-000000-000000": {
+        "ok": true,
+        "data": {
+          "table": "x",
+          "rows": [
+            {
+              "month": "202610",
+              "currency": "USD",
+              "netMinor": 2482
+            },
+            {
+              "month": "202609",
+              "currency": "USD",
+              "netMinor": 3145
+            }
+          ],
+          "exportTime": "2026-10-17T09:00:00.000Z",
+          "dryRunBytes": 1048576
+        },
+        "fetchedAt": "2026-10-17T11:57:00.000Z"
+      },
+      "budgets:000000-000000-000000": {
+        "ok": true,
+        "data": [
+          {
+            "name": "Monthly cap",
+            "scope": "account",
+            "period": "month",
+            "amount": {
+              "kind": "specified",
+              "minor": 5000,
+              "currency": "USD"
+            }
+          }
+        ],
+        "fetchedAt": "2026-10-17T11:57:00.000Z"
+      },
+      "projects": {
+        "ok": true,
+        "data": [
+          {
+            "projectId": "fake-alpha",
+            "displayName": "Alpha",
+            "projectNumber": "123456789012"
+          },
+          {
+            "projectId": "fake-beta",
+            "displayName": "Beta",
+            "projectNumber": "223456789012"
+          },
+          {
+            "projectId": "fake-sandbox",
+            "displayName": "Sandbox",
+            "projectNumber": "323456789012"
+          }
+        ],
+        "fetchedAt": "2026-10-17T11:57:00.000Z"
+      },
+      "services:fake-alpha": {
+        "ok": true,
+        "data": {
+          "count": 25,
+          "names": [
+            "run.googleapis.com",
+            "sqladmin.googleapis.com",
+            "aiplatform.googleapis.com",
+            "storage.googleapis.com",
+            "monitoring.googleapis.com"
+          ]
+        },
+        "fetchedAt": "2026-10-17T11:57:00.000Z"
+      },
+      "services:fake-beta": {
+        "ok": true,
+        "data": {
+          "count": 23,
+          "names": [
+            "run.googleapis.com",
+            "storage.googleapis.com",
+            "monitoring.googleapis.com"
+          ]
+        },
+        "fetchedAt": "2026-10-17T11:57:00.000Z"
+      },
+      "services:fake-sandbox": {
+        "ok": true,
+        "data": {
+          "count": 21,
+          "names": [
+            "storage.googleapis.com"
+          ]
+        },
+        "fetchedAt": "2026-10-17T11:57:00.000Z"
+      },
+      "billingInfo:fake-alpha": {
+        "ok": true,
+        "data": {
+          "billingEnabled": true,
+          "billingAccountId": "000000-000000-000000"
+        },
+        "fetchedAt": "2026-10-17T11:57:00.000Z"
+      },
+      "billingInfo:fake-beta": {
+        "ok": true,
+        "data": {
+          "billingEnabled": true,
+          "billingAccountId": "000000-000000-000000"
+        },
+        "fetchedAt": "2026-10-17T11:57:00.000Z"
+      },
+      "billingInfo:fake-sandbox": {
+        "ok": true,
+        "data": {
+          "billingEnabled": false
+        },
+        "fetchedAt": "2026-10-17T11:57:00.000Z"
+      },
+      "run:fake-alpha": {
+        "ok": true,
+        "data": {
+          "resources": [
+            {
+              "type": "run",
+              "id": "fake-alpha/us-central1/api",
+              "name": "api",
+              "projectId": "fake-alpha",
+              "location": "us-central1",
+              "reportedState": "Ready=True · api-00042-xyz",
+              "mapped": {
+                "kind": "ready"
+              },
+              "consoleUrl": "https://console.cloud.google.com/run/api?project=fake-alpha"
+            },
+            {
+              "type": "run",
+              "id": "fake-alpha/europe-west1/worker",
+              "name": "worker",
+              "projectId": "fake-alpha",
+              "location": "europe-west1",
+              "reportedState": "Ready=False · worker-00007-aaa",
+              "mapped": {
+                "kind": "degraded",
+                "reason": "latest revision failed, previous still serving"
+              },
+              "consoleUrl": "https://console.cloud.google.com/run/worker?project=fake-alpha"
+            }
+          ]
+        },
+        "fetchedAt": "2026-10-17T11:57:00.000Z"
+      },
+      "run:fake-beta": {
+        "ok": true,
+        "data": {
+          "resources": [
+            {
+              "type": "run",
+              "id": "fake-beta/us-central1/site",
+              "name": "site",
+              "projectId": "fake-beta",
+              "location": "us-central1",
+              "reportedState": "Ready=True · site-00003-abc",
+              "mapped": {
+                "kind": "ready"
+              },
+              "consoleUrl": "https://console.cloud.google.com/run/site?project=fake-beta"
+            }
+          ]
+        },
+        "fetchedAt": "2026-10-17T11:57:00.000Z"
+      },
+      "run:fake-sandbox": {
+        "ok": false,
+        "kind": "disabled",
+        "reason": "Cloud Run Admin API not enabled",
+        "fetchedAt": "2026-10-17T11:57:00.000Z"
+      },
+      "sql:fake-alpha": {
+        "ok": true,
+        "data": {
+          "resources": [
+            {
+              "type": "sql",
+              "id": "fake-alpha/us-central1/main-db",
+              "name": "main-db",
+              "projectId": "fake-alpha",
+              "location": "us-central1",
+              "reportedState": "RUNNABLE · ALWAYS · POSTGRES_16",
+              "mapped": {
+                "kind": "ready"
+              },
+              "consoleUrl": "https://console.cloud.google.com/sql/main-db?project=fake-alpha"
+            },
+            {
+              "type": "sql",
+              "id": "fake-alpha/us-central1/old-db",
+              "name": "old-db",
+              "projectId": "fake-alpha",
+              "location": "us-central1",
+              "reportedState": "RUNNABLE · NEVER",
+              "mapped": {
+                "kind": "unknown",
+                "reason": "stopped"
+              },
+              "consoleUrl": "https://console.cloud.google.com/sql/old-db?project=fake-alpha"
+            }
+          ]
+        },
+        "fetchedAt": "2026-10-17T11:57:00.000Z"
+      },
+      "sql:fake-beta": {
+        "ok": false,
+        "kind": "disabled",
+        "reason": "Cloud SQL Admin API not enabled",
+        "fetchedAt": "2026-10-17T11:57:00.000Z"
+      },
+      "sql:fake-sandbox": {
+        "ok": false,
+        "kind": "disabled",
+        "reason": "Cloud SQL Admin API not enabled",
+        "fetchedAt": "2026-10-17T11:57:00.000Z"
+      },
+      "vertex:fake-alpha:us-central1": {
+        "ok": true,
+        "data": {
+          "resources": [
+            {
+              "type": "vertex",
+              "id": "fake-alpha/us-central1/gemma-chat",
+              "name": "gemma-chat",
+              "projectId": "fake-alpha",
+              "location": "us-central1",
+              "reportedState": "1 deployed model",
+              "mapped": {
+                "kind": "ready"
+              },
+              "consoleUrl": "https://console.cloud.google.com/vertex/gemma-chat?project=fake-alpha"
+            }
+          ]
+        },
+        "fetchedAt": "2026-10-17T11:57:00.000Z"
+      },
+      "vertex:fake-beta:us-central1": {
+        "ok": false,
+        "kind": "disabled",
+        "reason": "Vertex AI API not enabled",
+        "fetchedAt": "2026-10-17T11:57:00.000Z"
+      },
+      "vertex:fake-sandbox:us-central1": {
+        "ok": false,
+        "kind": "disabled",
+        "reason": "Vertex AI API not enabled",
+        "fetchedAt": "2026-10-17T11:57:00.000Z"
+      },
+      "storage:fake-alpha": {
+        "ok": true,
+        "data": {
+          "resources": [
+            {
+              "type": "storage",
+              "id": "fake-alpha/us/fake-alpha-assets",
+              "name": "fake-alpha-assets",
+              "projectId": "fake-alpha",
+              "location": "us",
+              "reportedState": "STANDARD",
+              "mapped": {
+                "kind": "unknown",
+                "reason": "no running state"
+              },
+              "consoleUrl": "https://console.cloud.google.com/storage/fake-alpha-assets?project=fake-alpha",
+              "createdAt": "2025-01-01T00:00:00Z"
+            },
+            {
+              "type": "storage",
+              "id": "fake-alpha/us/fake-alpha-new",
+              "name": "fake-alpha-new",
+              "projectId": "fake-alpha",
+              "location": "us",
+              "reportedState": "STANDARD",
+              "mapped": {
+                "kind": "unknown",
+                "reason": "no running state"
+              },
+              "consoleUrl": "https://console.cloud.google.com/storage/fake-alpha-new?project=fake-alpha",
+              "createdAt": "2026-10-17T02:00:00.000Z"
+            }
+          ]
+        },
+        "fetchedAt": "2026-10-17T11:57:00.000Z"
+      },
+      "storage:fake-beta": {
+        "ok": true,
+        "data": {
+          "resources": [
+            {
+              "type": "storage",
+              "id": "fake-beta/us/fake-beta-site",
+              "name": "fake-beta-site",
+              "projectId": "fake-beta",
+              "location": "us",
+              "reportedState": "STANDARD",
+              "mapped": {
+                "kind": "unknown",
+                "reason": "no running state"
+              },
+              "consoleUrl": "https://console.cloud.google.com/storage/fake-beta-site?project=fake-beta",
+              "createdAt": "2025-01-01T00:00:00Z"
+            },
+            {
+              "type": "storage",
+              "id": "fake-beta/us/fake-beta-empty",
+              "name": "fake-beta-empty",
+              "projectId": "fake-beta",
+              "location": "us",
+              "reportedState": "STANDARD",
+              "mapped": {
+                "kind": "unknown",
+                "reason": "no running state"
+              },
+              "consoleUrl": "https://console.cloud.google.com/storage/fake-beta-empty?project=fake-beta",
+              "createdAt": "2025-01-01T00:00:00Z"
+            }
+          ]
+        },
+        "fetchedAt": "2026-10-17T11:57:00.000Z"
+      },
+      "storage:fake-sandbox": {
+        "ok": true,
+        "data": {
+          "resources": [
+            {
+              "type": "storage",
+              "id": "fake-sandbox/us/fake-sandbox-scratch",
+              "name": "fake-sandbox-scratch",
+              "projectId": "fake-sandbox",
+              "location": "us",
+              "reportedState": "STANDARD",
+              "mapped": {
+                "kind": "unknown",
+                "reason": "no running state"
+              },
+              "consoleUrl": "https://console.cloud.google.com/storage/fake-sandbox-scratch?project=fake-sandbox",
+              "createdAt": "2025-01-01T00:00:00Z"
+            }
+          ]
+        },
+        "fetchedAt": "2026-10-17T11:57:00.000Z"
+      },
+      "storageSize:fake-alpha": {
+        "ok": true,
+        "data": {
+          "sizes": {
+            "fake-alpha-assets": 412000000000
+          },
+          "asOf": "2026-10-17T08:00:00.000Z"
+        },
+        "fetchedAt": "2026-10-17T11:57:00.000Z"
+      },
+      "storageSize:fake-beta": {
+        "ok": true,
+        "data": {
+          "sizes": {
+            "fake-beta-site": 1500000
+          },
+          "asOf": "2026-10-17T08:00:00.000Z"
+        },
+        "fetchedAt": "2026-10-17T11:57:00.000Z"
+      },
+      "storageSize:fake-sandbox": {
+        "ok": false,
+        "kind": "disabled",
+        "reason": "Cloud Monitoring API not enabled",
+        "fetchedAt": "2026-10-17T11:57:00.000Z"
+      }
+    }
+  }
+}

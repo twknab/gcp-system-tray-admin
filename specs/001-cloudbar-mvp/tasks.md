@@ -372,12 +372,12 @@ with reason "not monitored".
 
 ### Tests for US2
 
-- [ ] T050 [P] [US2] Write `tests/sources/projects.test.ts`:
+- [X] T050 [P] [US2] Write `tests/sources/projects.test.ts`:
   - `projects:search?query=state:ACTIVE` with pagination;
   - `excludeProjects` filtering;
   - `serviceusage` enabled-API counts with pagination (pageSize 200);
   - an `enabledApis` set that lets disabled sources be skipped without a call.
-- [ ] T051 [P] [US2] Write `tests/sources/run.test.ts`, using the R4 mapping table:
+- [X] T051 [P] [US2] Write `tests/sources/run.test.ts`, using the R4 mapping table:
   - Ready=True with matching revisions → Ready;
   - Ready=False with an older ready revision → Degraded, "latest revision failed, previous still
     serving";
@@ -385,50 +385,50 @@ with reason "not monitored".
   - Ready=Unknown → unknown, "deploying";
   - `unreachable[]` regions → an unavailable note;
   - the v2 fallback path.
-- [ ] T052 [P] [US2] Write `tests/sources/sql.test.ts`, covering the R5 table: RUNNABLE plus
+- [X] T052 [P] [US2] Write `tests/sources/sql.test.ts`, covering the R5 table: RUNNABLE plus
   ALWAYS, RUNNABLE plus NEVER, MAINTENANCE, REPAIRING, FAILED, SUSPENDED, PENDING_CREATE, and
   PENDING_DELETE.
-- [ ] T053 [P] [US2] Write `tests/sources/vertex.test.ts`:
+- [X] T053 [P] [US2] Write `tests/sources/vertex.test.ts`:
   - one call per configured region, to the regional host;
   - deployed models → Ready;
   - none → unknown, "idle, no models deployed".
-- [ ] T054 [P] [US2] Write `tests/sources/storage.test.ts`:
+- [X] T054 [P] [US2] Write `tests/sources/storage.test.ts`:
   - buckets list;
   - `total_bytes` grouped by `bucket_name`, using the latest point time as `sizeAsOf`;
   - no series and created under 48 h ago → `'pending'`;
   - no series and older → 0 B, "no objects";
   - a failed size call → `'unavailable'` for every bucket in that project, with the bucket list
     still shown.
-- [ ] T055 [P] [US2] Write `tests/unit/resourceStatus.test.ts`, covering `resourceStatus(resource,
+- [X] T055 [P] [US2] Write `tests/unit/resourceStatus.test.ts`, covering `resourceStatus(resource,
   coverage=∅, alerts=[])`:
   - Ready → unknown, "not monitored";
   - Degraded and Down pass through;
   - storage is always unknown;
   - "billing disabled" in a project → unknown with that reason.
-- [ ] T056 [P] [US2] Write `tests/render/services.test.ts` with snapshots for fixtures `services`,
+- [X] T056 [P] [US2] Write `tests/render/services.test.ts` with snapshots for fixtures `services`,
   `services-overflow` (30 buckets), and `denied` (Cloud SQL disabled in one project). Assert
   invariants 2 and 4 from contracts/swiftbar-output.md, and that no Cloud Storage line ever uses
   the healthy symbol.
 
 ### Implementation for US2
 
-- [ ] T057 [P] [US2] Implement `src/sources/projects.ts` (R11).
-- [ ] T058 [P] [US2] Implement `src/sources/services.ts` (R12), giving the enabled-API set and
+- [X] T057 [P] [US2] Implement `src/sources/projects.ts` (R11).
+- [X] T058 [P] [US2] Implement `src/sources/services.ts` (R12), giving the enabled-API set and
   count per project.
-- [ ] T059 [P] [US2] Implement `src/sources/run.ts`: the v1 global list, then the R4 mapping, then
+- [X] T059 [P] [US2] Implement `src/sources/run.ts`: the v1 global list, then the R4 mapping, then
   `Resource[]`, with the v2 per-region fallback. The console URL is
   `https://console.cloud.google.com/run/detail/<region>/<name>/metrics?project=<p>`.
-- [ ] T060 [P] [US2] Implement `src/sources/sql.ts` (R5). The console URL is
+- [X] T060 [P] [US2] Implement `src/sources/sql.ts` (R5). The console URL is
   `https://console.cloud.google.com/sql/instances/<name>/overview?project=<p>`.
-- [ ] T061 [P] [US2] Implement `src/sources/vertex.ts` (R6). The console URL is
+- [X] T061 [P] [US2] Implement `src/sources/vertex.ts` (R6). The console URL is
   `https://console.cloud.google.com/vertex-ai/online-prediction/locations/<r>/endpoints/<id>?project=<p>`.
-- [ ] T062 [P] [US2] Implement `src/sources/storage.ts` (R7): buckets plus a sizes timeSeries call
+- [X] T062 [P] [US2] Implement `src/sources/storage.ts` (R7): buckets plus a sizes timeSeries call
   per project, with a 6 h `storageSize` TTL separate from the 15 min bucket-list TTL. The console
   URL is `https://console.cloud.google.com/storage/browser/<bucket>?project=<p>`.
-- [ ] T063 [US2] Implement `resourceStatus(resource, coverage, alerts)` in `src/model/status.ts`,
+- [X] T063 [US2] Implement `resourceStatus(resource, coverage, alerts)` in `src/model/status.ts`,
   following data-model.md "Status rule", and `groupStatus(items)` (worst status, with unknown
   ranked above healthy).
-- [ ] T064 [US2] Extend `src/model/view.ts` with service groups:
+- [X] T064 [US2] Extend `src/model/view.ts` with service groups:
   - groups ordered Cloud Run, Cloud SQL, Vertex AI, Cloud Storage;
   - items sorted worst status first, then project display name, then name;
   - each group capped at 25, with "and N more";
@@ -436,19 +436,19 @@ with reason "not monitored".
   - the bucket total size, plus the partial and pending rules (FR-023);
   - the Projects reference list with enabled-API counts.
   `overallStatus` now includes the items.
-- [ ] T065 [US2] Extend `src/render/swiftbar.ts` with:
+- [X] T065 [US2] Extend `src/render/swiftbar.ts` with:
   - group headers, as count plus worst-status symbol, with "· us-central1" for Vertex and "(N
     buckets · X GB)" for Storage;
   - item lines, "name · project display name";
   - item submenus, with state, location, project, status reason, and Open in Console;
   - overflow, the unavailable note, and the Projects section.
-- [ ] T066 [US2] Register the sources in `src/refresh.ts`:
+- [X] T066 [US2] Register the sources in `src/refresh.ts`:
   - `projects` and `services:<p>` (1 h);
   - `run:<p>`, `sql:<p>`, `vertex:<p>:<r>`, and `storage:<p>` (15 min);
   - `storageSize:<p>` (6 h).
   A source whose API is not in `enabledApis` is recorded as `{ok:false, kind:'disabled'}` without
   a request.
-- [ ] T067 [P] [US2] Create fixtures `tests/fixtures/{services,services-overflow,denied}.json` with
+- [X] T067 [P] [US2] Create fixtures `tests/fixtures/{services,services-overflow,denied}.json` with
   fake IDs.
 
 **Checkpoint**: US1, US4, and US2 all work. Every resource is visible with its project, and is

@@ -34,10 +34,8 @@ export function statusParams(s: Status): Params {
 }
 
 /** Text label so status never depends on colour alone (FR-020). */
-export function statusLabel(s: Status): string {
-  if (s.level === 'healthy') return 'healthy';
-  return s.reason ? `${s.level}: ${s.reason}` : s.level;
-}
+export { statusLabelText as statusLabel } from '../model/statusText.js';
+import { statusLabelText as statusLabel } from '../model/statusText.js';
 
 export function renderTitle(v: ViewModel): string {
   const st = STATUS_STYLE[v.overall.level];

@@ -1,6 +1,7 @@
 // PURE: Snapshot + Config → ViewModel. No I/O.
 import { buildBillingSummary } from './billing.js';
 import { findingsFromSnapshot } from './findings.js';
+import { buildServices } from './services.js';
 import { overallStatus } from './status.js';
 import { formatMoneyByCurrency } from '../render/format.js';
 import type { BillingSummary, Config, Snapshot, ViewModel } from './types.js';
@@ -44,13 +45,14 @@ export function invoiceMonths(now: Date): { month: string; lastMonth: string } {
 export function buildView(snapshot: Snapshot, config: Config, now: Date, paths: ViewPaths, extra: { setupIssues?: ViewModel['setupIssues']; quotaProject?: string | undefined } = {}): ViewModel {
   const billing = buildBillingSummary(snapshot, config, now, invoiceMonths(now));
   const partial = billing.available && billing.coveredAccounts < billing.visibleAccounts;
-  return {
-    overall: overallStatus([], billing),
+  const services = buildServices({ snapshot, config, now, coverage: new Set(), alerts: [] });
+  const view: ViewModel = {
+    overall: overallStatus(services.statuses, billing),
     titleAmount: billing.available ? `${partial ? '~' : ''}${formatMoneyByCurrency(billing.mtd)}` : null,
     billing,
-    groups: [],
+    groups: services.groups,
     alerts: null,
-    projects: null,
+    projects: services.projects,
     setupIssues: [
       ...(extra.setupIssues ?? []),
       ...findingsFromSnapshot(snapshot, config, extra.quotaProject)
@@ -62,4 +64,6 @@ export function buildView(snapshot: Snapshot, config: Config, now: Date, paths: 
     offline: !snapshot.updatedAt,
     paths: { ...paths, config: config.path },
   };
+  if (services.projectsUnavailable) view.projectsUnavailable = services.projectsUnavailable;
+  return view;
 }
