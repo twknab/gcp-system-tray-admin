@@ -31,24 +31,24 @@ and **US4** (setup check and shortcuts). At that point a working menu can be ins
 
 **Purpose**: initialise the TypeScript project and the developer loop.
 
-- [ ] T001 Create `package.json`:
+- [X] T001 Create `package.json`:
   - `"type": "module"`, `"engines": {"node": ">=22"}`, `"bin": {"cloudbar": "dist/cli.js"}`
   - scripts `build` (`tsc -p .`), `typecheck` (`tsc --noEmit`), `test` (`vitest run`), and
     `lint` (`tsc --noEmit && node scripts/check-fixtures.mjs`)
   - dependency `google-auth-library`
   - devDependencies `typescript`, `vitest`, `@types/node`
-- [ ] T002 [P] Create `tsconfig.json`:
+- [X] T002 [P] Create `tsconfig.json`:
   - `strict`, `target`/`module` `ES2022`/`NodeNext`, `outDir dist`, `rootDir src`
   - `noUncheckedIndexedAccess`, `exactOptionalPropertyTypes`
-- [ ] T003 [P] Create `vitest.config.ts` with `include: ['tests/**/*.test.ts']` and node
+- [X] T003 [P] Create `vitest.config.ts` with `include: ['tests/**/*.test.ts']` and node
   environment.
-- [ ] T004 [P] Extend `.gitignore` with `dist/`, `coverage/`, and `config.json`.
-- [ ] T005 [P] Create `config.example.json`, matching `specs/001-cloudbar-mvp/contracts/config.schema.json`.
+- [X] T004 [P] Extend `.gitignore` with `dist/`, `coverage/`, and `config.json`.
+- [X] T005 [P] Create `config.example.json`, matching `specs/001-cloudbar-mvp/contracts/config.schema.json`.
   Use the fake IDs `000000-000000-000000` and `example-project`.
-- [ ] T006 [P] Create `scripts/check-fixtures.mjs`. It fails if any file in `tests/fixtures/`
+- [X] T006 [P] Create `scripts/check-fixtures.mjs`. It fails if any file in `tests/fixtures/`
   contains a billing-account-shaped ID that isn't one digit repeated (`/^(\d)\1{5}-\1{6}-\1{6}$/`),
   or a `projectId`/`projects/<id>` value not prefixed `fake-` or `example-` (Principle V).
-- [ ] T007 [P] Create `.github/workflows/ci.yml`: Node 22, `npm ci`, `npm run lint`, `npm test`,
+- [X] T007 [P] Create `.github/workflows/ci.yml`: Node 22, `npm ci`, `npm run lint`, `npm test`,
   and `npm run build`.
 
 ---
@@ -61,12 +61,12 @@ and **US4** (setup check and shortcuts). At that point a working menu can be ins
 
 ### Tests for Foundational
 
-- [ ] T008 [P] Write `tests/unit/http.guard.test.ts`:
+- [X] T008 [P] Write `tests/unit/http.guard.test.ts`:
   - The `http.ts` client rejects every method except GET.
   - POST is allowed only to `https://bigquery.googleapis.com/bigquery/v2/projects/*/queries`.
   - Any URL containing `:enable`, `:disable`, `:batchEnable`, `/delete`, or `:patch` is rejected.
   - Covers Principle I and FR-016.
-- [ ] T009 [P] Write `tests/unit/http.classify.test.ts`, covering the error classifier against the
+- [X] T009 [P] Write `tests/unit/http.classify.test.ts`, covering the error classifier against the
   ErrorInfo shapes in research.md R12:
 
   | Response | Kind |
@@ -80,17 +80,17 @@ and **US4** (setup check and shortcuts). At that point a working menu can be ins
   | 5xx | `other` |
   | timeout | `timeout` |
   | fetch rejection | `network` |
-- [ ] T010 [P] Write `tests/unit/cache.test.ts`:
+- [X] T010 [P] Write `tests/unit/cache.test.ts`:
   - per-source TTL staleness (FR-013, FR-015a);
   - an atomic write survives a crash mid-write (simulated with a temp file);
   - a `schemaVersion` mismatch discards the cache;
   - the lock file blocks a second refresher, and a lock older than 60 s is taken over.
-- [ ] T011 [P] Write `tests/unit/config.test.ts`:
+- [X] T011 [P] Write `tests/unit/config.test.ts`:
   - defaults are applied;
   - invalid `vertexRegions` and invalid billing-ID keys are rejected;
   - a missing file means defaults, not a crash;
   - `CLOUDBAR_CONFIG` and `--config` override the path.
-- [ ] T012 [P] Write `tests/unit/format.test.ts`:
+- [X] T012 [P] Write `tests/unit/format.test.ts`:
   - money from minor units, per currency;
   - bytes (B, KB, MB, GB, TB, base 1000, one decimal);
   - relative time ("just now", "3m ago", "2h ago", "3d ago");
@@ -98,21 +98,21 @@ and **US4** (setup check and shortcuts). At that point a working menu can be ins
 
 ### Implementation for Foundational
 
-- [ ] T013 Create `src/model/types.ts` with every type in `data-model.md`:
+- [X] T013 Create `src/model/types.ts` with every type in `data-model.md`:
   - `StatusLevel`, `Status`, `FailureKind`, `SourceResult<T>`
   - `Project`, `Resource` (a discriminated union over `run`, `sql`, `vertex`, `storage`)
   - `Alert`, `BillingAccount`, `Budget`, `BillingSummary`
   - `Snapshot` (`schemaVersion: 1`), `Config`, `SetupFinding`, and `ViewModel`
-- [ ] T014 [P] Implement `src/config.ts`. It loads and validates
+- [X] T014 [P] Implement `src/config.ts`. It loads and validates
   `~/.config/cloudbar/config.json` with a hand-written validator (no schema library) and applies
   these defaults:
   - `vertexRegions: ["us-central1"]`
   - `runRegions: ["us-central1"]`
   - `maxBytesBilled: 1073741824`
   - TTLs as listed in `contracts/config.schema.json`
-- [ ] T015 [P] Implement `src/render/format.ts`: money, bytes, relative time, escaping, and
+- [X] T015 [P] Implement `src/render/format.ts`: money, bytes, relative time, escaping, and
   truncation, so that T012 passes.
-- [ ] T016 Implement `src/http.ts`:
+- [X] T016 Implement `src/http.ts`:
   - `createHttp({ fetch, getToken, quotaProject, timeoutMs: 10000 })` exposes `getJson(url)`,
     `getAllPages(url, itemsKey)` (follows `nextPageToken` or `pageToken`), and `bigQueryPost(url,
     body)`.
@@ -121,24 +121,24 @@ and **US4** (setup check and shortcuts). At that point a working menu can be ins
   - The classifier returns a `SourceResult` failure.
   - `fetch` is injected, so tests never touch the network.
   - T008 and T009 must pass.
-- [ ] T017 Implement `src/auth.ts`:
+- [X] T017 Implement `src/auth.ts`:
   - `GoogleAuth` with scopes `cloud-platform.read-only` and `bigquery.readonly`. Expose
     `getToken()` and `getQuotaProject()`, taken from config or ADC's `quota_project_id`.
   - Fallback: run `gcloud auth print-access-token` via `execFile`, searching for gcloud in
     `/opt/homebrew/bin`, `/usr/local/bin`, `~/google-cloud-sdk/bin`, then `PATH`.
   - Failures surface as `{ kind: 'auth' }` with the sign-in command in the reason.
-- [ ] T018 Implement `src/cache.ts`:
+- [X] T018 Implement `src/cache.ts`:
   - `loadSnapshot`, `saveSnapshot` (write to a temp file, then rename), `isStale(result, ttl,
     now)`, `withLock(fn)` (`O_EXCL` lock file with a 60-second override).
   - The cache directory is `$SWIFTBAR_PLUGIN_CACHE_PATH`, falling back to
     `~/Library/Caches/cloudbar`.
   - T010 must pass.
-- [ ] T019 Implement `src/refresh.ts`:
+- [X] T019 Implement `src/refresh.ts`:
   - `refresh(snapshot, sources, { force, now, budgetMs: 25000, concurrency: 8 })` runs only the
     stale (or forced) source keys and keeps `lastGood` on failure.
   - A source that misses the overall budget keeps its previous value, marked stale.
   - Sources are registered as `{ key, ttlKey, run(ctx) }`.
-- [ ] T020 Implement `src/render/swiftbar.ts` as a skeleton: `renderMenu(view: ViewModel):
+- [X] T020 Implement `src/render/swiftbar.ts` as a skeleton: `renderMenu(view: ViewModel):
   string[]` emits the title line, the section order from `contracts/swiftbar-output.md`, and the
   **Shortcuts** section:
   - "Updated Xm ago"
@@ -148,17 +148,17 @@ and **US4** (setup check and shortcuts). At that point a working menu can be ins
   - Open Cloud Console
   - Status uses the symbols and `light,dark` colours from contracts/swiftbar-output.md (research
     R14).
-- [ ] T021 Implement `src/model/view.ts` as a skeleton: `buildView(snapshot, config, now):
+- [X] T021 Implement `src/model/view.ts` as a skeleton: `buildView(snapshot, config, now):
   ViewModel`, with sections empty until stories fill them in. "No cache, no network" must still
   yield a title, an unknown status, and Shortcuts (spec edge case: offline).
-- [ ] T022 Implement `src/cli.ts`:
+- [X] T022 Implement `src/cli.ts`:
   - commands `render` (default), `refresh`, `doctor`, and `render --fixture <name>`;
   - flags `--config` and `--no-cache`;
   - `SWIFTBAR_PLUGIN_REFRESH_REASON` of `MenuAction`, `FirstLaunch`, or `WakeFromSleep` forces a
     full refresh;
   - `render` always exits 0, catching every error and rendering a minimal menu
     (contracts/cli.md).
-- [ ] T023 Create `cloudbar.5m.sh`, the SwiftBar shim:
+- [X] T023 Create `cloudbar.5m.sh`, the SwiftBar shim:
   - Shebang `#!/bin/bash`, plus metadata tags `<swiftbar.hideRunInTerminal>true`,
     `<swiftbar.hideLastUpdated>true`, and `<swiftbar.hideDisablePlugin>true`.
   - Resolve `node` from `config.nodePath`, then `/opt/homebrew/bin/node`, `/usr/local/bin/node`,
@@ -167,7 +167,7 @@ and **US4** (setup check and shortcuts). At that point a working menu can be ins
     `exec node "$DIR/dist/cli.js" "$@"`.
   - If node is not found, print one title line "☁︎ ?" and the submenu line "Node.js 22+ not found
     — see README".
-- [ ] T024 [P] Create `tests/render/shell.test.ts` as a snapshot of the Foundational menu (title,
+- [X] T024 [P] Create `tests/render/shell.test.ts` as a snapshot of the Foundational menu (title,
   unknown status, Shortcuts) for an empty snapshot. Assert invariants 1, 3, 5, and 7 from
   contracts/swiftbar-output.md. Invariant 7: the four status levels render with four different
   `sfimage` values, and non-healthy submenu lines carry a text label (FR-020).

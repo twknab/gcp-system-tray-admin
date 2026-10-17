@@ -1,0 +1,13 @@
+// Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
+
+exports[`minimal menu (no cache, no network) > renders title, unknown status and shortcuts 1`] = `
+[
+  "| sfimage=icloud sfcolor=#6E6E73,#98989D tooltip="CloudBar — unknown: no data yet"",
+  "---",
+  "Not updated yet | color=#6E6E73,#98989D size=11",
+  "Refresh | sfimage=arrow.clockwise bash=/opt/homebrew/bin/node param0=/Users/me/cloudbar/dist/cli.js param1=refresh terminal=false refresh=true",
+  "Run setup check… | sfimage=stethoscope bash=/opt/homebrew/bin/node param0=/Users/me/cloudbar/dist/cli.js param1=doctor terminal=true",
+  "Settings… | sfimage=gearshape bash=/usr/bin/open param0=-t param1=/Users/me/.config/cloudbar/config.json terminal=false",
+  "Open Cloud Console | sfimage=globe href=https://console.cloud.google.com/",
+]
+`;

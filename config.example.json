@@ -1,0 +1,10 @@
+{
+  "billingExports": {
+    "000000-000000-000000": "example-project.billing_export.gcp_billing_export_v1_000000_000000_000000"
+  },
+  "quotaProject": "example-project",
+  "vertexRegions": ["us-central1"],
+  "runRegions": ["us-central1"],
+  "excludeProjects": [],
+  "maxBytesBilled": 1073741824
+}
