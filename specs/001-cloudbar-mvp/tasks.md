@@ -46,8 +46,8 @@ and **US4** (setup check and shortcuts). At that point a working menu can be ins
 - [ ] T005 [P] Create `config.example.json`, matching `specs/001-cloudbar-mvp/contracts/config.schema.json`.
   Use the fake IDs `000000-000000-000000` and `example-project`.
 - [ ] T006 [P] Create `scripts/check-fixtures.mjs`. It fails if any file in `tests/fixtures/`
-  contains a billing account ID other than `000000-000000-000000` or `111111-111111-111111`, or a
-  project ID not prefixed `fake-` (Principle V).
+  contains a billing-account-shaped ID that isn't one digit repeated (`/^(\d)\1{5}-\1{6}-\1{6}$/`),
+  or a `projectId`/`projects/<id>` value not prefixed `fake-` or `example-` (Principle V).
 - [ ] T007 [P] Create `.github/workflows/ci.yml`: Node 22, `npm ci`, `npm run lint`, `npm test`,
   and `npm run build`.
 
@@ -168,8 +168,9 @@ and **US4** (setup check and shortcuts). At that point a working menu can be ins
   - If node is not found, print one title line "☁︎ ?" and the submenu line "Node.js 22+ not found
     — see README".
 - [ ] T024 [P] Create `tests/render/shell.test.ts` as a snapshot of the Foundational menu (title,
-  unknown status, Shortcuts) for an empty snapshot. Assert invariants 1, 3, and 5 from
-  contracts/swiftbar-output.md.
+  unknown status, Shortcuts) for an empty snapshot. Assert invariants 1, 3, 5, and 7 from
+  contracts/swiftbar-output.md. Invariant 7: the four status levels render with four different
+  `sfimage` values, and non-healthy submenu lines carry a text label (FR-020).
 
 **Checkpoint**: `npm test` passes, and `node dist/cli.js render` prints a valid minimal menu
 without credentials.
@@ -194,9 +195,12 @@ $0.01 (SC-003).
     naming. Save a redacted copy as `tests/fixtures/bq/table-meta.json`.
   - If the table is not partitioned on `_PARTITIONTIME`, change the query's partition predicate
     in `src/sources/costs.ts` to match, and note it in research.md R10.
-- [ ] T026 [US1] **Verify R13 BigQuery scope.** Confirm that a token with the `bigquery.readonly`
-  scope can call `jobs.query`. If it can't, switch only the costs client to the `bigquery` scope
-  in `src/auth.ts`, and record the result in research.md R13.
+- [ ] T026 [US1] **Verify R13 credentials for BigQuery.**
+  - On the owner's machine, confirm that the real ADC user token can call `jobs.query` (a dry
+    run) against the export table.
+  - Record which scopes the token actually carries (`gcloud auth application-default
+    print-access-token` → tokeninfo).
+  - Record the result in research.md R13. Read-only is enforced by the guard, not by scopes.
 
 ### Tests for US1
 
@@ -258,7 +262,9 @@ $0.01 (SC-003).
 - [ ] T037 [US1] Extend `src/render/swiftbar.ts` with:
   - the title amount (`~` prefix when partial);
   - the Billing section and the per-account submenu;
-  - "Costs unavailable — export not set up", linking to `docs/billing-export-setup.md` on GitHub;
+  - "Costs unavailable — export not set up", which opens the **local**
+    `<repo>/docs/billing-export-setup.md` (`bash=/usr/bin/open param0=<path>`), with a GitHub link
+    as an alternate (`alternate=true`) for when the repo isn't on disk;
   - "Cost data as of …" and the stale label.
 - [ ] T038 [US1] Register `billingAccounts`, `costs:<account>`, and `budgets:<account>` sources in
   `src/refresh.ts` with TTLs of 1 h, 4 h, and 4 h.
@@ -525,11 +531,14 @@ Also: buckets are unknown or alert-driven only, and the overall status follows t
 - [ ] T077 [P] Write `tests/integration/render.e2e.test.ts`. It runs `cli.ts render` with a mocked
   `fetch` serving every `tests/fixtures/api/*` response, and an empty cache, then asserts:
   - a complete menu renders within 2 s of local time;
-  - a second run makes zero requests while the cache is fresh;
+  - a second run makes zero requests while the cache is fresh, and renders in **under 300 ms**
+    (the plan's target). A failure above 1 s means SC-002 is not met;
   - `SWIFTBAR_PLUGIN_REFRESH_REASON=MenuAction` refetches everything (Story 4 #4).
 - [ ] T078 [P] Write `tests/integration/degradation.test.ts`. For each source key in turn, make it
   fail. Assert that every other section still renders (SC-005), and that the failed one shows its
-  `lastGood` value with its age, or an unavailable reason.
+  `lastGood` value with its age, or an unavailable reason. Also cover an **all-auth-fail** case,
+  where every source fails with `auth`: the title has no amount, the overall status is unknown,
+  the "⚠ setup issues" line names the sign-in step, and Shortcuts still render.
 - [ ] T079 [P] Write `tests/integration/readonly.test.ts`. Record every request made during the
   e2e run, and assert that each one is GET or BigQuery `queries` POST, and that every BigQuery
   body has `maximumBytesBilled` (SC-006).

@@ -64,6 +64,8 @@ No open alerts · 7 policies                                         ← or one 
 Projects (6) | sfimage=folder
 --Hughes Intelligence · 23 APIs | href=https://console.cloud.google.com/home/dashboard?project=…
 ---
+⚠ 2 setup issues | sfimage=exclamationmark.triangle sfcolor=#FF9F0A   ← only when a check fails
+--Credentials expired — run: gcloud auth application-default login
 Updated 3m ago | color=#8E8E93 size=11
 Refresh | sfimage=arrow.clockwise bash=<node> param0=<cli> param1=refresh terminal=false refresh=true
 Run setup check… | sfimage=stethoscope bash=<node> param0=<cli> param1=doctor terminal=true
@@ -80,3 +82,7 @@ Open Cloud Console | sfimage=globe href=https://console.cloud.google.com/
 4. No item is shown with the healthy symbol unless its Status is `healthy`. Cloud Storage items
    never are.
 5. The Shortcuts section always renders, even in the "no cache, no network" state.
+6. The "⚠ N setup issues" line appears if and only if at least one `fail` finding exists. It sits
+   directly above "Updated …".
+7. The four status levels use four different `sfimage` values. Every non-healthy line in a
+   submenu carries a text label, so status never depends on colour alone (FR-020).

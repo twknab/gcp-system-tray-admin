@@ -149,6 +149,11 @@ docs/
 network and are impure), **model** (pure), and **render** (pure). Only `sources/`, `auth.ts`,
 `http.ts`, and `cache.ts` touch I/O.
 
+## Glossary
+
+- **Setup check** (as the menu and spec call it) and **`doctor`** (the CLI command and
+  `src/doctor.ts`) are the same feature.
+
 ## Key Design Decisions
 
 1. **The cache is read first, and refreshes are short and bounded.**

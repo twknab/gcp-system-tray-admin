@@ -213,6 +213,10 @@ fixture, before the related task is closed.
 
 ## R13. Credentials and quota project
 
+- **Enforcement:** read-only behaviour is enforced by the request guard in `http.ts`, and checked
+  by tests T008 and T079. OAuth scopes do **not** enforce it. A user ADC refresh token keeps the
+  scopes it was minted with, which is usually `cloud-platform`, so requesting narrower scopes is
+  best-effort at most.
 - **Decision:**
   - `google-auth-library` `GoogleAuth({scopes:['https://www.googleapis.com/auth/cloud-platform.read-only']})`.
   - `cloud-platform.read-only` does not cover BigQuery `jobs.query`, so add the `bigquery.readonly`
