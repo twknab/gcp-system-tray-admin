@@ -32,18 +32,32 @@ Text is escaped:
 | down | `xmark.octagon.fill` | `#FF3B30` | "down: <reason>" |
 | unknown | `questionmark.circle` | `#8E8E93` | "<reason>" (e.g. "not monitored") |
 
+As built, colours are `light,dark` pairs: healthy `#248A3D,#30D158`, degraded `#B25000,#FF9F0A`,
+down `#D70015,#FF453A`, unknown `#6E6E73,#98989D`.
+
+The **title** symbol changes shape with the overall status, so the menu bar itself never relies on
+colour alone:
+
+| Level | Title `sfimage` |
+|-------|-----------------|
+| healthy | `checkmark.icloud.fill` |
+| degraded | `exclamationmark.icloud.fill` |
+| down | `xmark.icloud.fill` |
+| unknown | `icloud` |
+
 ## Layout (in order)
 
 ```text
-$24.82 | sfimage=cloud.fill sfcolor=<overall> dropdown=true        ← title; amount omitted when unavailable; "~$24.82" when partial
+$24.82 | sfimage=<title symbol> sfcolor=<overall> tooltip=…          ← title; amount omitted when unavailable; "~$24.82" when partial
 ---
 Billing | sfimage=creditcard
 October to date      $24.82 (partial 2 of 3 accounts)
 September            $31.45
 Budget "Monthly cap"  $50.00 · $25.18 left
 Cost data as of 3h ago                                             ← "stale" label when > 24h
---<Account name>  $20.10 MTD · $28.00 last month · budget …        ← one per account
---<Account> Costs unavailable — export not set up | href=<docs>
+Billing accounts (3) | sfimage=building.columns                    ← when >1 account, or any account unreadable
+--<Account name>  $20.10 to date · $28.00 last month | href=<billing console>
+--<Account>: Costs unavailable — export not set up | href=<billing console>
 ---
 Cloud Run (4) | sfimage=<worst> sfcolor=<worst>
 --api · hughes-intel | sfimage=… sfcolor=…
@@ -58,8 +72,9 @@ Cloud SQL (2) | …
 Vertex AI (3) · us-central1 | …
 Cloud Storage (8 buckets · 412 GB) | …                              ← "(partial)" if any size unavailable
 ---
-Alerts | sfimage=bell
-No open alerts · 7 policies                                         ← or one line per alert with severity icon + age + href
+Alerts | sfimage=bell                                              ← "Alerts (N open)" when any are open
+No open alerts · 7 policies                                         ← or one line per alert:
+Checkout 5xx rate · Gamma · critical · open 30m | sfimage=xmark.octagon.fill … href=<alert console>
 ---
 Projects (6) | sfimage=folder
 --Hughes Intelligence · 23 APIs | href=https://console.cloud.google.com/home/dashboard?project=…

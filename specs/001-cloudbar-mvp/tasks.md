@@ -528,25 +528,25 @@ Also: buckets are unknown or alert-driven only, and the overall status follows t
 
 ## Phase 7: Polish & Cross-Cutting Concerns
 
-- [ ] T077 [P] Write `tests/integration/render.e2e.test.ts`. It runs `cli.ts render` with a mocked
+- [X] T077 [P] Write `tests/integration/render.e2e.test.ts`. It runs `cli.ts render` with a mocked
   `fetch` serving every `tests/fixtures/api/*` response, and an empty cache, then asserts:
   - a complete menu renders within 2 s of local time;
   - a second run makes zero requests while the cache is fresh, and renders in **under 300 ms**
     (the plan's target). A failure above 1 s means SC-002 is not met;
   - `SWIFTBAR_PLUGIN_REFRESH_REASON=MenuAction` refetches everything (Story 4 #4).
-- [ ] T078 [P] Write `tests/integration/degradation.test.ts`. For each source key in turn, make it
+- [X] T078 [P] Write `tests/integration/degradation.test.ts`. For each source key in turn, make it
   fail. Assert that every other section still renders (SC-005), and that the failed one shows its
   `lastGood` value with its age, or an unavailable reason. Also cover an **all-auth-fail** case,
   where every source fails with `auth`: the title has no amount, the overall status is unknown,
   the "⚠ setup issues" line names the sign-in step, and Shortcuts still render.
-- [ ] T079 [P] Write `tests/integration/readonly.test.ts`. Record every request made during the
+- [X] T079 [P] Write `tests/integration/readonly.test.ts`. Record every request made during the
   e2e run, and assert that each one is GET or BigQuery `queries` POST, and that every BigQuery
   body has `maximumBytesBilled` (SC-006).
-- [ ] T080 Run quickstart.md §A on all four documented fixtures, and paste the outputs into the PR
+- [X] T080 Run quickstart.md §A on all four documented fixtures, and paste the outputs into the PR
   description.
 - [ ] T081 Have the owner run quickstart.md §B on their Mac (install, `doctor`, live menu) and
   record the results in the PR. This is a manual step and the merge gate.
-- [ ] T082 [P] Update `specs/001-cloudbar-mvp/research.md` so that every "verify in implement"
+- [X] T082 [P] Update `specs/001-cloudbar-mvp/research.md` so that every "verify in implement"
   item is marked confirmed or changed, with the fixture path.
 
 ---

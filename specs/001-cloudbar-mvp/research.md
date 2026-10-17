@@ -252,3 +252,19 @@ fixture, before the related task is closed.
     `FirstLaunch`.
   - Status colours use `light,dark` pairs for contrast in both appearances.
   - The plugin is a bash shim, `cloudbar.5m.sh`, so the default `runInBash` is fine.
+
+## Verification status (implementation, 2026-10-17)
+
+Responses in `tests/fixtures/api/` were **written by hand from the documented shapes**, not captured
+from a live account. Items below stay open until the owner runs the matching task on their own
+machine and replaces the fixture with a redacted real capture.
+
+| Item | Status | How it's covered now | Closes with |
+|------|--------|----------------------|-------------|
+| R4 Cloud Run v1 global list spans regions | open | `run-v1-list.json`, plus a tested v2 per-region fallback | T048 |
+| R1 alerts list permission string | open | `alerts-open.json`; a denial degrades to "Alerts unavailable" | T068 |
+| R3 real policy condition shapes | open | `alert-policies.json` covers threshold, absent, MQL and PromQL | T068 |
+| R10 export table naming and `_PARTITIONTIME` | open | the dry run plus the byte cap make a wrong guess fail safely | T025 |
+| R13 ADC token can run `jobs.query` | open | read-only is enforced by the guard, not by scopes | T026 |
+| R14 SwiftBar `--` nesting, `light,dark` colours | open | output follows the xbar grammar | T047 |
+| R5, R6, R7 response field names | open | `sql-instances.json`, `vertex-endpoints.json`, `storage-*.json` | T049 |

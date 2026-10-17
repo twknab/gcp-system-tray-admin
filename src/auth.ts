@@ -71,8 +71,9 @@ export function createAuth(): Auth {
     source: async () => (await ensure()).via,
     async adcQuotaProject() {
       try {
+        // Only the ADC quota project: the gcloud default project is not necessarily usable for quota.
         const client = (await google.getClient()) as { quotaProjectId?: string };
-        return client.quotaProjectId ?? (await google.getProjectId().catch(() => undefined)) ?? undefined;
+        return client.quotaProjectId ?? undefined;
       } catch {
         return undefined;
       }
