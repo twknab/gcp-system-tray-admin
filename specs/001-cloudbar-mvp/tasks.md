@@ -295,7 +295,7 @@ non-GET call.
 
 ### Tests for US4
 
-- [ ] T041 [P] [US4] Write `tests/unit/doctor.test.ts` with injected fake sources:
+- [X] T041 [P] [US4] Write `tests/unit/doctor.test.ts` with injected fake sources:
   - no ADC and no gcloud: fail credentials, with the next step `gcloud auth application-default login`;
   - no quota project: fail, with the step `gcloud auth application-default set-quota-project <id>`;
   - `USER_PROJECT_DENIED`: fail quotaProject, naming `serviceusage.services.use`;
@@ -304,23 +304,23 @@ non-GET call.
   - export not configured: warn billingExport, linking the docs;
   - an export table that doesn't exist (`datasets/{d}/tables` doesn't list it): fail;
   - budgets denied: warn.
-- [ ] T042 [P] [US4] Write `tests/render/doctor.test.ts` with snapshots of the `doctor` text
+- [X] T042 [P] [US4] Write snapshot tests (they landed in `tests/unit/doctor.test.ts`, next to the logic) of the `doctor` text
   output and of `doctor --swiftbar` output.
 
 ### Implementation for US4
 
-- [ ] T043 [US4] Implement `src/doctor.ts`:
+- [X] T043 [US4] Implement `src/doctor.ts`:
   - `runDoctor(ctx): SetupFinding[]` runs each source once with `force`, plus explicit checks:
     ADC present, quota project set, the needed APIs enabled in the quota project, and each
     configured export table exists via
     `GET bigquery/v2/projects/{p}/datasets/{d}/tables?maxResults=1000`.
   - Each `SourceResult` failure maps to a finding with a plain-English `message` and `nextStep`.
   - `formatFindings(findings, 'text'|'swiftbar')` formats the output.
-- [ ] T044 [US4] Wire `doctor` in `src/cli.ts`: exit 0 when everything passes, 1 on any fail, and
+- [X] T044 [US4] Wire `doctor` in `src/cli.ts`: exit 0 when everything passes, 1 on any fail, and
   `--swiftbar` for menu output.
-- [ ] T045 [US4] Add a "⚠ N setup issues" line to `src/render/swiftbar.ts`, shown only when the
+- [X] T045 [US4] Add a "⚠ N setup issues" line to `src/render/swiftbar.ts`, shown only when the
   last doctor run or the source failures include a `fail` finding. Its submenu lists the findings.
-- [ ] T046 [P] [US4] Write `README.md` covering:
+- [X] T046 [P] [US4] Write `README.md` covering:
   - what CloudBar is, and that it is read-only and never enables anything;
   - prerequisites (SwiftBar, Node 22, gcloud);
   - install steps from quickstart.md §B;

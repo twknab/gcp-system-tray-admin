@@ -44,6 +44,6 @@ export function assertInvariants(lines: string[]): void {
   const updated = lines.findIndex((l) => /^(Updated|Not updated)/.test(l));
   if (issue !== -1) {
     const between = lines.slice(issue + 1, updated);
-    expect(between.every((l) => l.startsWith('--'))).toBe(true);
+    expect(between.length > 0 && between.every((l) => l.startsWith('--'))).toBe(true);
   }
 }

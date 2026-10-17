@@ -17,8 +17,8 @@ function quote(v: string): string {
 }
 
 /** One SwiftBar line. Text is escaped and truncated; full text goes in the tooltip. */
-export function ln(text: string, params: Params = {}, depth = 0): string {
-  const t = truncate(text);
+export function ln(text: string, params: Params = {}, depth = 0, max = 60): string {
+  const t = truncate(text, max);
   const p: Params = { ...params };
   if (t.truncated && p.tooltip === undefined) p.tooltip = escapeText(text);
   const ps = Object.entries(p)
@@ -50,7 +50,10 @@ export function renderShortcuts(v: ViewModel): string[] {
   const out: string[] = [];
   if (v.setupIssues.length > 0) {
     out.push(ln(`⚠ ${v.setupIssues.length} setup issue${v.setupIssues.length === 1 ? '' : 's'}`, { sfimage: 'exclamationmark.triangle', sfcolor: STATUS_STYLE.degraded.sfcolor }));
-    for (const i of v.setupIssues) out.push(ln(i.nextStep ? `${i.message} — ${i.nextStep}` : i.message, {}, 1));
+    for (const i of v.setupIssues) {
+      out.push(ln(i.message, {}, 1, 120));
+      if (i.nextStep) out.push(ln(`→ ${i.nextStep}`, {}, 2, 120));
+    }
   }
   const updated = v.updatedAt ? `Updated ${formatAge(v.updatedAt, v.now)}` : 'Not updated yet';
   out.push(ln(v.offline && v.updatedAt ? `${updated} · offline` : updated, { color: MUTED, size: 11 }));
