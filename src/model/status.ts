@@ -24,5 +24,5 @@ export function overallStatus(items: Status[], billing: { overBudget: boolean })
   if (degraded) return { level: 'degraded', ...(degraded.reason ? { reason: degraded.reason } : {}) };
   if (billing.overBudget) return { level: 'degraded', reason: 'over budget' };
   if (items.some((s) => s.level === 'healthy')) return { level: 'healthy' };
-  return { level: 'unknown', reason: items.length ? 'nothing is monitored' : 'no data yet' };
+  return { level: 'unknown', reason: items.length ? 'nothing is monitored' : 'no services checked yet' };
 }

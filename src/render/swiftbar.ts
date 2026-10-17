@@ -61,7 +61,7 @@ export function renderShortcuts(v: ViewModel): string[] {
   return out;
 }
 
-/** Sections are rendered in contract order; later stories register theirs here. */
+/** Sections in contract order. Registered in render/sections.ts to avoid import cycles. */
 export const SECTIONS: SectionRenderer[] = [];
 
 export function renderMenu(v: ViewModel): string[] {

@@ -204,10 +204,10 @@ $0.01 (SC-003).
 
 ### Tests for US1
 
-- [ ] T027 [P] [US1] Write `tests/sources/billingAccounts.test.ts`:
+- [X] T027 [P] [US1] Write `tests/sources/billingAccounts.test.ts`:
   - `billingAccounts.list` fixture (two open accounts, one closed), with pagination;
   - `projects/{p}/billingInfo` fixtures, including `billingEnabled:false`.
-- [ ] T028 [P] [US1] Write `tests/sources/costs.test.ts`:
+- [X] T028 [P] [US1] Write `tests/sources/costs.test.ts`:
   - The query text contains the partition predicate and both `invoice.month` values.
   - The body has `useLegacySql:false` and `maximumBytesBilled` set to the config value as a
     string.
@@ -215,13 +215,13 @@ $0.01 (SC-003).
     `totalBytesProcessed > cap`.
   - Rows are parsed into minor units per currency, and `MAX(export_time)` gives `exportTime`.
   - An unconfigured account gives `{ ok:false, kind:'other', reason:'export not configured' }`.
-- [ ] T029 [P] [US1] Write `tests/sources/budgets.test.ts`:
+- [X] T029 [P] [US1] Write `tests/sources/budgets.test.ts`:
   - `specifiedAmount` (units plus nanos) is converted to minor units.
   - `lastPeriodAmount` becomes `{kind:'lastPeriod'}`.
   - Account-scoped versus filtered budgets are classified correctly.
   - `customPeriod` is flagged.
   - An empty list is `ok` with `[]`.
-- [ ] T030 [P] [US1] Write `tests/unit/billingSummary.test.ts`, covering summary derivation in
+- [X] T030 [P] [US1] Write `tests/unit/billingSummary.test.ts`, covering summary derivation in
   `src/model/view.ts`:
   - per-currency sums;
   - partial when some accounts are unreadable, and `coveredAccounts`/`visibleAccounts` agree;
@@ -232,7 +232,7 @@ $0.01 (SC-003).
   - remaining and overspend are computed;
   - the 24-hour stale flag is based on `exportTime` (FR-015b);
   - negative and zero net spend are shown as reported.
-- [ ] T031 [P] [US1] Write `tests/render/billing.test.ts` with snapshots for fixtures `billing`
+- [X] T031 [P] [US1] Write `tests/render/billing.test.ts` with snapshots for fixtures `billing`
   (two accounts, USD), `billing-partial`, `billing-multicurrency`, `no-export`, `no-budget`,
   `over-budget`, and `stale-costs`. Assert:
   - the title has no amount when nothing is readable;
@@ -243,39 +243,39 @@ $0.01 (SC-003).
 
 ### Implementation for US1
 
-- [ ] T032 [P] [US1] Implement `src/sources/billingAccounts.ts`: `listBillingAccounts`, and
+- [X] T032 [P] [US1] Implement `src/sources/billingAccounts.ts`: `listBillingAccounts`, and
   `getProjectBillingInfo(projectId)` using `getAllPages` (research R8).
-- [ ] T033 [P] [US1] Implement `src/sources/costs.ts`:
+- [X] T033 [P] [US1] Implement `src/sources/costs.ts`:
   - Build the R10 query for each configured `billingExports[accountId]`.
   - Run a dry run on the first call for each table, recording `dryRunBytes` in the snapshot, and
     again whenever the table name changes.
   - Then run `bigQueryPost` against `projects/{jobProject}/queries`, where `jobProject` is
     `config.quotaProject` or the table's project.
   - Parse `rows[].f[].v` into `{ mtdMinor, lastMonthMinor, currency, exportTime }`.
-- [ ] T034 [P] [US1] Implement `src/sources/budgets.ts`: `listBudgets(accountId)` per research R9.
-- [ ] T035 [US1] Extend `src/model/status.ts` with `overallStatus(items, billing)`, using the
+- [X] T034 [P] [US1] Implement `src/sources/budgets.ts`: `listBudgets(accountId)` per research R9.
+- [X] T035 [US1] Extend `src/model/status.ts` with `overallStatus(items, billing)`, using the
   precedence in data-model.md (down, then degraded, including over budget, then healthy if any,
   then unknown). Before US2 and US3 there are no items, so the result is `unknown`, or `degraded`
   when over budget.
-- [ ] T036 [US1] Extend `src/model/view.ts` with `buildBillingSummary(accounts, now)` (T030) and
+- [X] T036 [US1] Extend `src/model/view.ts` with `buildBillingSummary(accounts, now)` (T030) and
   the billing section of the view model.
-- [ ] T037 [US1] Extend `src/render/swiftbar.ts` with:
+- [X] T037 [US1] Extend `src/render/swiftbar.ts` with:
   - the title amount (`~` prefix when partial);
   - the Billing section and the per-account submenu;
   - "Costs unavailable — export not set up", which opens the **local**
     `<repo>/docs/billing-export-setup.md` (`bash=/usr/bin/open param0=<path>`), with a GitHub link
     as an alternate (`alternate=true`) for when the repo isn't on disk;
   - "Cost data as of …" and the stale label.
-- [ ] T038 [US1] Register `billingAccounts`, `costs:<account>`, and `budgets:<account>` sources in
+- [X] T038 [US1] Register `billingAccounts`, `costs:<account>`, and `budgets:<account>` sources in
   `src/refresh.ts` with TTLs of 1 h, 4 h, and 4 h.
-- [ ] T039 [P] [US1] Write `docs/billing-export-setup.md`, the steps the owner performs:
+- [X] T039 [P] [US1] Write `docs/billing-export-setup.md`, the steps the owner performs:
   - Create a **US or EU multi-region** dataset, so the backfill to the previous month works
     (research R10).
   - Billing → Billing export → Standard usage cost → choose the dataset.
   - Wait up to 24 hours, and up to 5 days for backfill.
   - Copy the table name into `billingExports`.
   - It states clearly that CloudBar never does any of this.
-- [ ] T040 [P] [US1] Create fixtures `tests/fixtures/{billing,billing-partial,billing-multicurrency,no-export,no-budget,over-budget,stale-costs}.json`
+- [X] T040 [P] [US1] Create fixtures `tests/fixtures/{billing,billing-partial,billing-multicurrency,no-export,no-budget,over-budget,stale-costs}.json`
   as `Snapshot` documents with fake IDs, so that T006 passes.
 
 **Checkpoint**: US1 works on its own. Both the title and the Billing section render from real or

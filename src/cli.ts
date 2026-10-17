@@ -10,7 +10,8 @@ import { createHttp, type FetchFn } from './http.js';
 import type { Config, Snapshot, ViewModel } from './model/types.js';
 import { buildView } from './model/view.js';
 import { refresh } from './refresh.js';
-import { renderMenu } from './render/swiftbar.js';
+import { renderMenu } from './render/sections.js';
+import './sources/all.js';
 import { buildPlanner } from './sources/index.js';
 
 const here = dirname(fileURLToPath(import.meta.url));

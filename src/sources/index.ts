@@ -14,6 +14,8 @@ export type PlanPart = (snapshot: Snapshot, ctx: SourceContext) => SourceDef[];
 
 export const PLAN_PARTS: PlanPart[] = [];
 
+/** Registration happens in sources/all.ts to avoid import cycles. */
+
 export function buildPlanner(ctx: SourceContext, parts: PlanPart[] = PLAN_PARTS): Planner {
   return (snapshot) => parts.flatMap((part) => part(snapshot, ctx));
 }

@@ -1,5 +1,7 @@
 // PURE: Snapshot + Config → ViewModel. No I/O.
+import { buildBillingSummary } from './billing.js';
 import { overallStatus } from './status.js';
+import { formatMoneyByCurrency } from '../render/format.js';
 import type { BillingSummary, Config, Snapshot, ViewModel } from './types.js';
 
 export interface ViewPaths {
@@ -39,10 +41,11 @@ export function invoiceMonths(now: Date): { month: string; lastMonth: string } {
 }
 
 export function buildView(snapshot: Snapshot, config: Config, now: Date, paths: ViewPaths, extra: { setupIssues?: ViewModel['setupIssues'] } = {}): ViewModel {
-  const billing = emptyBilling(now);
+  const billing = buildBillingSummary(snapshot, config, now, invoiceMonths(now));
+  const partial = billing.available && billing.coveredAccounts < billing.visibleAccounts;
   return {
     overall: overallStatus([], billing),
-    titleAmount: null,
+    titleAmount: billing.available ? `${partial ? '~' : ''}${formatMoneyByCurrency(billing.mtd)}` : null,
     billing,
     groups: [],
     alerts: null,

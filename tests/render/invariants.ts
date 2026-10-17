@@ -4,7 +4,7 @@ import { join } from 'node:path';
 import { parseConfig } from '../../src/config.js';
 import type { Snapshot, ViewModel } from '../../src/model/types.js';
 import { buildView } from '../../src/model/view.js';
-import { renderMenu } from '../../src/render/swiftbar.js';
+import { renderMenu } from '../../src/render/sections.js';
 
 export const PATHS = { node: '/opt/homebrew/bin/node', cli: '/Users/me/cloudbar/dist/cli.js', docs: '/Users/me/cloudbar/docs/billing-export-setup.md' };
 
