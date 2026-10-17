@@ -1,0 +1,34 @@
+{
+  "alertPolicies": [
+    {
+      "name": "projects/fake-alpha/alertPolicies/1",
+      "displayName": "Cloud Run 5xx",
+      "enabled": true,
+      "conditions": [{ "conditionThreshold": { "filter": "resource.type = \"cloud_run_revision\" AND metric.type = \"run.googleapis.com/request_count\" AND metric.labels.response_code_class = \"5xx\"" } }]
+    },
+    {
+      "name": "projects/fake-alpha/alertPolicies/2",
+      "displayName": "SQL CPU (MQL)",
+      "enabled": true,
+      "conditions": [{ "conditionMonitoringQueryLanguage": { "query": "fetch cloudsql_database::cloudsql.googleapis.com/database/cpu/utilization | every 1m | condition val() > 0.9" } }]
+    },
+    {
+      "name": "projects/fake-alpha/alertPolicies/3",
+      "displayName": "Vertex latency (PromQL)",
+      "enabled": true,
+      "conditions": [{ "conditionPrometheusQueryLanguage": { "query": "histogram_quantile(0.99, sum by (le) (rate(aiplatform_googleapis_com:prediction_online_prediction_latencies_bucket{monitored_resource=\"aiplatform.googleapis.com/Endpoint\"}[5m]))) > 2000" } }]
+    },
+    {
+      "name": "projects/fake-alpha/alertPolicies/4",
+      "displayName": "Disabled bucket policy",
+      "enabled": false,
+      "conditions": [{ "conditionThreshold": { "filter": "resource.type='gcs_bucket'" } }]
+    },
+    {
+      "name": "projects/fake-alpha/alertPolicies/5",
+      "displayName": "Some VM thing",
+      "enabled": true,
+      "conditions": [{ "conditionAbsent": { "filter": "resource.type=\"gce_instance\"" } }]
+    }
+  ]
+}

@@ -1,0 +1,44 @@
+{
+  "now": "2026-10-17T12:00:00Z",
+  "config": {},
+  "snapshot": {
+    "schemaVersion": 1,
+    "updatedAt": "2026-10-17T11:57:00.000Z",
+    "sources": {
+      "billingAccounts": {
+        "ok": true,
+        "data": [
+          {
+            "id": "000000-000000-000000",
+            "displayName": "Personal",
+            "open": true,
+            "currencyCode": "USD"
+          }
+        ],
+        "fetchedAt": "2026-10-17T11:57:00.000Z"
+      },
+      "costs:000000-000000-000000": {
+        "ok": false,
+        "kind": "other",
+        "reason": "export not configured",
+        "fetchedAt": "2026-10-17T11:57:00.000Z"
+      },
+      "budgets:000000-000000-000000": {
+        "ok": true,
+        "data": [
+          {
+            "name": "Monthly cap",
+            "scope": "account",
+            "period": "month",
+            "amount": {
+              "kind": "specified",
+              "minor": 5000,
+              "currency": "USD"
+            }
+          }
+        ],
+        "fetchedAt": "2026-10-17T11:57:00.000Z"
+      }
+    }
+  }
+}

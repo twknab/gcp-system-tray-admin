@@ -1,0 +1,6 @@
+{
+  "uptimeCheckConfigs": [
+    { "name": "projects/fake-alpha/uptimeCheckConfigs/u1", "displayName": "api", "monitoredResource": { "type": "cloud_run_revision", "labels": { "service_name": "api", "location": "us-central1" } } },
+    { "name": "projects/fake-alpha/uptimeCheckConfigs/u2", "displayName": "homepage", "monitoredResource": { "type": "uptime_url", "labels": { "host": "example.com" } } }
+  ]
+}
