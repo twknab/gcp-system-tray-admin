@@ -89,7 +89,7 @@ exports[`Billing section > no-export 1`] = `
   "Billing | sfimage=creditcard",
   "Costs unavailable — export not set up | sfimage=questionmark.circle sfcolor=#6E6E73,#98989D bash=/usr/bin/open param0=/Users/me/cloudbar/docs/billing-export-setup.md terminal=false",
   "Costs unavailable — export not set up (open guide online) | href=https://github.com/twknab/gcp-system-tray-admin/blob/main/docs/billing-export-setup.md alternate=true",
-  "Budget “Monthly cap” $50.00 · $50.00 left",
+  "Budget “Monthly cap” $50.00 · spend unknown",
   "Billing accounts (1) | sfimage=building.columns",
   "--Personal: Costs unavailable — export not set up | href=https://console.cloud.google.com/billing/000000-000000-000000",
   "---",

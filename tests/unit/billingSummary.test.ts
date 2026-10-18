@@ -62,6 +62,11 @@ describe('billing summary', () => {
     });
     expect(s.mtd).toEqual({ USD: -125 });
   });
+  it('never claims budget remaining when spend is unknown', () => {
+    const s = summary('no-export');
+    expect(s.budgetLines[0]).toMatchObject({ amountMinor: 5000, remainingMinor: null });
+    expect(s.overBudget).toBe(false);
+  });
   it('reports export not set up', () => {
     const s = summary('no-export');
     expect(s.available).toBe(false);

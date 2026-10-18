@@ -22,10 +22,10 @@ function pickBudgets(budgets: Budget[]): Budget[] {
   return budgets; // custom periods: shown, not used for "remaining"
 }
 
-function budgetLines(budgets: Budget[], mtd: MoneyByCurrency, lastMonth: MoneyByCurrency | null, fallbackCurrency: string | undefined): BudgetLine[] {
+function budgetLines(budgets: Budget[], mtd: MoneyByCurrency | null, lastMonth: MoneyByCurrency | null, fallbackCurrency: string | undefined): BudgetLine[] {
   return pickBudgets(budgets).map((b) => {
     if (b.period !== 'month') return { name: b.name, currency: b.amount.kind === 'specified' ? b.amount.currency : null, amountMinor: b.amount.kind === 'specified' ? b.amount.minor : null, remainingMinor: null, note: 'custom period' };
-    const currency = b.amount.kind === 'specified' ? b.amount.currency : Object.keys(lastMonth ?? mtd)[0] ?? fallbackCurrency ?? null;
+    const currency = b.amount.kind === 'specified' ? b.amount.currency : Object.keys(lastMonth ?? mtd ?? {})[0] ?? fallbackCurrency ?? null;
     let amount: number | null = null;
     let note: string | undefined;
     if (b.amount.kind === 'specified') amount = b.amount.minor;
@@ -33,8 +33,9 @@ function budgetLines(budgets: Budget[], mtd: MoneyByCurrency, lastMonth: MoneyBy
       amount = lastMonth[currency]!;
       note = "last month's spend";
     } else note = 'Budget amount unavailable';
-    const spent = currency ? mtd[currency] ?? 0 : 0;
-    const line: BudgetLine = { name: b.name, currency, amountMinor: amount, remainingMinor: amount === null ? null : amount - spent };
+    // Unknown spend is not zero spend: without cost data there is no "remaining" (Principle II).
+    const spent = mtd && currency ? mtd[currency] ?? 0 : null;
+    const line: BudgetLine = { name: b.name, currency, amountMinor: amount, remainingMinor: amount === null || spent === null ? null : amount - spent };
     if (note) line.note = note;
     return line;
   });
@@ -88,7 +89,7 @@ export function buildBillingSummary(snapshot: Snapshot, config: Config, now: Dat
     } else {
       summary.reason = cr && !cr.ok ? cr.reason : 'not loaded yet';
     }
-    if (budgets) summary.budgetLines = budgetLines(budgets, summary.mtd, summary.lastMonth, a.currencyCode);
+    if (budgets) summary.budgetLines = budgetLines(budgets, summary.ok ? summary.mtd : null, summary.lastMonth, a.currencyCode);
     else if (br && !br.ok) summary.budgetsUnavailable = br.reason;
     base.accounts.push(summary);
   }

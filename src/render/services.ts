@@ -32,7 +32,7 @@ export function renderProjects(v: ViewModel): string[] {
   const out = [ln(`Projects (${v.projects.length})`, { sfimage: 'folder' })];
   if (v.projectsUnavailable) out.push(ln(v.projectsUnavailable, { color: MUTED }, 1, 100));
   for (const p of v.projects) {
-    const apis = p.apiCount === null ? 'APIs unknown' : `${p.apiCount} APIs`;
+    const apis = p.apiCount === null ? 'APIs unknown' : `${p.apiCount} API${p.apiCount === 1 ? '' : 's'}`;
     out.push(ln(`${p.label} · ${apis}${p.note ? ` · ${p.note}` : ''}`, { href: p.consoleUrl }, 1));
   }
   return out;

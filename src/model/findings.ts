@@ -75,7 +75,10 @@ export function findingsFromSnapshot(snapshot: Snapshot, config: Config, quotaPr
     }
     if (family === 'costs' && r.kind === 'quota') {
       push({ area: 'billingExport', level: 'fail', message: `Spend query for “${accountName(scope ?? '')}” was not run: ${r.reason}`, nextStep: 'check the export table name, or raise maxBytesBilled in the config' });
+      continue;
     }
+    // Anything else (timeouts, 404s, Google errors): name it so it can be looked into.
+    push({ area: 'permissions', level: 'warn', ...(scope ? { projectId: scope } : {}), message: `Could not read ${meta?.label ?? family}${scope ? ` (${scope})` : ''}: ${r.reason}` });
   }
   for (const [, u] of unused) {
     const list = u.projects.sort();

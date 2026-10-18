@@ -11,7 +11,7 @@ function budgetText(l: BudgetLine): string {
   if (l.amountMinor === null || !l.currency) return `Budget “${l.name}”: ${l.note ?? 'amount unavailable'}`;
   const amount = formatMoney(l.amountMinor, l.currency);
   const suffix = l.note ? ` (${l.note})` : '';
-  if (l.remainingMinor === null) return `Budget “${l.name}” ${amount}${suffix}`;
+  if (l.remainingMinor === null) return `Budget “${l.name}” ${amount}${suffix}${l.note ? '' : ' · spend unknown'}`;
   const rest = l.remainingMinor >= 0 ? `${formatMoney(l.remainingMinor, l.currency)} left` : `${formatMoney(-l.remainingMinor, l.currency)} over`;
   return `Budget “${l.name}” ${amount} · ${rest}${suffix}`;
 }
