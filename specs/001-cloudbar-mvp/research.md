@@ -266,5 +266,5 @@ machine and replaces the fixture with a redacted real capture.
 | R3 real policy condition shapes | open | `alert-policies.json` covers threshold, absent, MQL and PromQL | T068 |
 | R10 export table naming and `_PARTITIONTIME` | open | the dry run plus the byte cap make a wrong guess fail safely | T025 |
 | R13 ADC token can run `jobs.query` | open | read-only is enforced by the guard, not by scopes | T026 |
-| R14 SwiftBar `--` nesting, `light,dark` colours | open | output follows the xbar grammar | T047 |
+| R14 SwiftBar `--` nesting, `light,dark` colours | **nesting confirmed** on the owner's Mac (2026-10-18). **Colours not applied** to dropdown `sfimage` items, which render monochrome, and lines with no action render greyed | follow-up: try `sfconfig` palette rendering; give info lines a no-op action or `color=` | T047 |
 | R5, R6, R7 response field names | open | `sql-instances.json`, `vertex-endpoints.json`, `storage-*.json` | T049 |
