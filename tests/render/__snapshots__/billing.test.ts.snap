@@ -1,0 +1,138 @@
+// Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
+
+exports[`Billing section > billing 1`] = `
+[
+  "$24.82 | sfimage=icloud sfcolor=#6E6E73,#98989D tooltip="CloudBar — unknown: no services checked yet"",
+  "---",
+  "Billing | sfimage=creditcard",
+  "October to date  $24.82",
+  "September  $31.45",
+  "Budget “Monthly cap (Personal)” $50.00 · $29.90 left",
+  "Cost data as of 3h ago | color=#6E6E73,#98989D size=11",
+  "Billing accounts (2) | sfimage=building.columns",
+  "--Personal  $20.10 to date · $28.00 last month | href=https://console.cloud.google.com/billing/000000-000000-000000",
+  "--Side projects  $4.72 to date · $3.45 last month | href=https://console.cloud.google.com/billing/111111-111111-111111",
+  "---",
+  "Updated 3m ago | color=#6E6E73,#98989D size=11",
+  "Refresh | sfimage=arrow.clockwise bash=/opt/homebrew/bin/node param0=/Users/me/cloudbar/dist/cli.js param1=refresh terminal=false refresh=true",
+  "Run setup check… | sfimage=stethoscope bash=/opt/homebrew/bin/node param0=/Users/me/cloudbar/dist/cli.js param1=doctor terminal=true",
+  "Settings… | sfimage=gearshape bash=/usr/bin/open param0=-t param1=/Users/me/.config/cloudbar/config.json terminal=false",
+  "Open Cloud Console | sfimage=globe href=https://console.cloud.google.com/",
+]
+`;
+
+exports[`Billing section > billing-multicurrency 1`] = `
+[
+  "€12.50 + $24.82 | sfimage=icloud sfcolor=#6E6E73,#98989D tooltip="CloudBar — unknown: no services checked yet"",
+  "---",
+  "Billing | sfimage=creditcard",
+  "October to date  €12.50 + $24.82",
+  "September  €9.00 + $31.45",
+  "No budget set | href=https://console.cloud.google.com/billing/budgets",
+  "Cost data as of 3h ago | color=#6E6E73,#98989D size=11",
+  "Billing accounts (2) | sfimage=building.columns",
+  "--Personal  $24.82 to date · $31.45 last month | href=https://console.cloud.google.com/billing/000000-000000-000000",
+  "--EU account  €12.50 to date · €9.00 last month | href=https://console.cloud.google.com/billing/111111-111111-111111",
+  "---",
+  "Updated 3m ago | color=#6E6E73,#98989D size=11",
+  "Refresh | sfimage=arrow.clockwise bash=/opt/homebrew/bin/node param0=/Users/me/cloudbar/dist/cli.js param1=refresh terminal=false refresh=true",
+  "Run setup check… | sfimage=stethoscope bash=/opt/homebrew/bin/node param0=/Users/me/cloudbar/dist/cli.js param1=doctor terminal=true",
+  "Settings… | sfimage=gearshape bash=/usr/bin/open param0=-t param1=/Users/me/.config/cloudbar/config.json terminal=false",
+  "Open Cloud Console | sfimage=globe href=https://console.cloud.google.com/",
+]
+`;
+
+exports[`Billing section > billing-partial 1`] = `
+[
+  "~$24.82 | sfimage=icloud sfcolor=#6E6E73,#98989D tooltip="CloudBar — unknown: no services checked yet"",
+  "---",
+  "Billing | sfimage=creditcard",
+  "October to date  $24.82 (partial 2 of 3 accounts)",
+  "September  $31.45",
+  "Budget “Monthly cap (Personal)” $50.00 · $29.90 left",
+  "Cost data as of 3h ago | color=#6E6E73,#98989D size=11",
+  "Billing accounts (3) | sfimage=building.columns",
+  "--Personal  $20.10 to date · $28.00 last month | href=https://console.cloud.google.com/billing/000000-000000-000000",
+  "--Side projects  $4.72 to date · $3.45 last month | href=https://console.cloud.google.com/billing/111111-111111-111111",
+  "--Client work: Costs unavailable — export not set up | href=https://console.cloud.google.com/billing/222222-222222-222222",
+  "---",
+  "Updated 3m ago | color=#6E6E73,#98989D size=11",
+  "Refresh | sfimage=arrow.clockwise bash=/opt/homebrew/bin/node param0=/Users/me/cloudbar/dist/cli.js param1=refresh terminal=false refresh=true",
+  "Run setup check… | sfimage=stethoscope bash=/opt/homebrew/bin/node param0=/Users/me/cloudbar/dist/cli.js param1=doctor terminal=true",
+  "Settings… | sfimage=gearshape bash=/usr/bin/open param0=-t param1=/Users/me/.config/cloudbar/config.json terminal=false",
+  "Open Cloud Console | sfimage=globe href=https://console.cloud.google.com/",
+]
+`;
+
+exports[`Billing section > no-budget 1`] = `
+[
+  "$24.82 | sfimage=icloud sfcolor=#6E6E73,#98989D tooltip="CloudBar — unknown: no services checked yet"",
+  "---",
+  "Billing | sfimage=creditcard",
+  "October to date  $24.82",
+  "September  $31.45",
+  "No budget set | href=https://console.cloud.google.com/billing/budgets",
+  "Cost data as of 3h ago | color=#6E6E73,#98989D size=11",
+  "---",
+  "Updated 3m ago | color=#6E6E73,#98989D size=11",
+  "Refresh | sfimage=arrow.clockwise bash=/opt/homebrew/bin/node param0=/Users/me/cloudbar/dist/cli.js param1=refresh terminal=false refresh=true",
+  "Run setup check… | sfimage=stethoscope bash=/opt/homebrew/bin/node param0=/Users/me/cloudbar/dist/cli.js param1=doctor terminal=true",
+  "Settings… | sfimage=gearshape bash=/usr/bin/open param0=-t param1=/Users/me/.config/cloudbar/config.json terminal=false",
+  "Open Cloud Console | sfimage=globe href=https://console.cloud.google.com/",
+]
+`;
+
+exports[`Billing section > no-export 1`] = `
+[
+  "| sfimage=icloud sfcolor=#6E6E73,#98989D tooltip="CloudBar — unknown: no services checked yet"",
+  "---",
+  "Billing | sfimage=creditcard",
+  "Costs unavailable — export not set up | sfimage=questionmark.circle sfcolor=#6E6E73,#98989D bash=/usr/bin/open param0=/Users/me/cloudbar/docs/billing-export-setup.md terminal=false",
+  "Costs unavailable — export not set up (open guide online) | href=https://github.com/twknab/gcp-system-tray-admin/blob/main/docs/billing-export-setup.md alternate=true",
+  "Budget “Monthly cap” $50.00 · spend unknown",
+  "Billing accounts (1) | sfimage=building.columns",
+  "--Personal: Costs unavailable — export not set up | href=https://console.cloud.google.com/billing/000000-000000-000000",
+  "---",
+  "Updated 3m ago | color=#6E6E73,#98989D size=11",
+  "Refresh | sfimage=arrow.clockwise bash=/opt/homebrew/bin/node param0=/Users/me/cloudbar/dist/cli.js param1=refresh terminal=false refresh=true",
+  "Run setup check… | sfimage=stethoscope bash=/opt/homebrew/bin/node param0=/Users/me/cloudbar/dist/cli.js param1=doctor terminal=true",
+  "Settings… | sfimage=gearshape bash=/usr/bin/open param0=-t param1=/Users/me/.config/cloudbar/config.json terminal=false",
+  "Open Cloud Console | sfimage=globe href=https://console.cloud.google.com/",
+]
+`;
+
+exports[`Billing section > over-budget 1`] = `
+[
+  "$53.00 | sfimage=exclamationmark.icloud.fill sfcolor=#B25000,#FF9F0A tooltip="CloudBar — degraded: over budget"",
+  "---",
+  "Billing | sfimage=creditcard",
+  "October to date  $53.00",
+  "September  $31.45",
+  "Budget “Monthly cap” $50.00 · $3.00 over | sfimage=exclamationmark.triangle.fill sfcolor=#B25000,#FF9F0A",
+  "Cost data as of 3h ago | color=#6E6E73,#98989D size=11",
+  "---",
+  "Updated 3m ago | color=#6E6E73,#98989D size=11",
+  "Refresh | sfimage=arrow.clockwise bash=/opt/homebrew/bin/node param0=/Users/me/cloudbar/dist/cli.js param1=refresh terminal=false refresh=true",
+  "Run setup check… | sfimage=stethoscope bash=/opt/homebrew/bin/node param0=/Users/me/cloudbar/dist/cli.js param1=doctor terminal=true",
+  "Settings… | sfimage=gearshape bash=/usr/bin/open param0=-t param1=/Users/me/.config/cloudbar/config.json terminal=false",
+  "Open Cloud Console | sfimage=globe href=https://console.cloud.google.com/",
+]
+`;
+
+exports[`Billing section > stale-costs 1`] = `
+[
+  "$24.82 | sfimage=icloud sfcolor=#6E6E73,#98989D tooltip="CloudBar — unknown: no services checked yet"",
+  "---",
+  "Billing | sfimage=creditcard",
+  "October to date  $24.82",
+  "September  $31.45",
+  "Budget “Monthly cap” $50.00 · $25.18 left",
+  "Cost data as of 1d ago · stale | color=#6E6E73,#98989D size=11",
+  "---",
+  "Updated 3m ago | color=#6E6E73,#98989D size=11",
+  "Refresh | sfimage=arrow.clockwise bash=/opt/homebrew/bin/node param0=/Users/me/cloudbar/dist/cli.js param1=refresh terminal=false refresh=true",
+  "Run setup check… | sfimage=stethoscope bash=/opt/homebrew/bin/node param0=/Users/me/cloudbar/dist/cli.js param1=doctor terminal=true",
+  "Settings… | sfimage=gearshape bash=/usr/bin/open param0=-t param1=/Users/me/.config/cloudbar/config.json terminal=false",
+  "Open Cloud Console | sfimage=globe href=https://console.cloud.google.com/",
+]
+`;
