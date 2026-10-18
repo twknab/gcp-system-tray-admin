@@ -86,6 +86,30 @@ describe('setup check (Story 4)', () => {
   });
 });
 
+describe('field report: per-project noise and misattributed billing', () => {
+  it('groups unused APIs into one note each, and blames the quota project for Cloud Billing', async () => {
+    const off = (svc: string) => ({ status: 403, body: { error: { message: 'off', details: [{ '@type': 'type.googleapis.com/google.rpc.ErrorInfo', reason: 'SERVICE_DISABLED', metadata: { service: svc } }] } } });
+    const f = await doctor({
+      quota: 'fake-quota',
+      routes: [
+        { match: 'https://cloudbilling.googleapis.com/', ...off('cloudbilling.googleapis.com') },
+        { match: 'https://cloudresourcemanager.googleapis.com/', body: { projects: [
+          { name: 'projects/1', projectId: 'fake-a', displayName: 'A' }, { name: 'projects/2', projectId: 'fake-b', displayName: 'B' },
+        ] } },
+        { match: 'https://serviceusage.googleapis.com/', body: { services: [{ name: 'x/run.googleapis.com', config: { name: 'run.googleapis.com' } }] } },
+        { match: 'https://run.googleapis.com/', body: { items: [] } },
+        { match: 'https://sqladmin.googleapis.com/', ...off('sqladmin.googleapis.com') },
+      ],
+    });
+    const billing = f.filter((x) => x.message.includes('Cloud Billing API'));
+    expect(billing).toHaveLength(1);
+    expect(billing[0]).toMatchObject({ level: 'fail', message: expect.stringContaining('quota project (fake-quota)') });
+    const sql = f.filter((x) => x.message.includes('Cloud SQL Admin API'));
+    expect(sql).toEqual([expect.objectContaining({ level: 'warn', message: 'Cloud SQL Admin API is off in 2 projects (fine if unused): fake-a, fake-b' })]);
+    expect(f.find((x) => x.message.includes('data sources readable'))!.message).toMatch(/skipped: API off/);
+  });
+});
+
 describe('placeholder config (field report: copied example config)', () => {
   it('flags example values and does not claim the quota project works', async () => {
     const f = await doctor({

@@ -74,9 +74,11 @@ export async function runDoctor(ctx: Context, opts: DoctorOptions): Promise<Setu
     findings.push({ area: 'billingExport', level: 'warn', message: 'No billing export is configured, so spend is unavailable', nextStep: 'follow docs/billing-export-setup.md' });
   findings.push(...(await checkExportTables(ctx)));
 
-  const failures = Object.values(snapshot.sources).filter((r) => !r.ok).length;
-  const total = Object.keys(snapshot.sources).length;
-  findings.push({ area: 'permissions', level: failures === 0 ? 'pass' : 'warn', message: `${total - failures} of ${total} data sources readable` });
+  const all = Object.values(snapshot.sources);
+  const skipped = all.filter((r) => !r.ok && r.kind === 'disabled').length;
+  const failures = all.filter((r) => !r.ok && r.kind !== 'disabled').length;
+  const checked = all.length - skipped;
+  findings.push({ area: 'permissions', level: failures === 0 ? 'pass' : 'warn', message: `${checked - failures} of ${checked} data sources readable${skipped ? ` (${skipped} skipped: API off)` : ''}` });
   return findings;
 }
 

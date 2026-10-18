@@ -7,11 +7,12 @@ export const QUOTA_STEP = 'gcloud auth application-default set-quota-project <a-
 /** Which API each source family depends on, and whether it is checked per project. */
 export const SOURCE_API: Record<string, { api: string; label: string; perProject: boolean }> = {
   billingAccounts: { api: 'cloudbilling.googleapis.com', label: 'Cloud Billing API', perProject: false },
-  billingInfo: { api: 'cloudbilling.googleapis.com', label: 'Cloud Billing API', perProject: true },
+  // Client-based APIs are checked through the quota project, whichever project they ask about.
+  billingInfo: { api: 'cloudbilling.googleapis.com', label: 'Cloud Billing API', perProject: false },
   costs: { api: 'bigquery.googleapis.com', label: 'BigQuery API', perProject: false },
   budgets: { api: 'billingbudgets.googleapis.com', label: 'Cloud Billing Budget API', perProject: false },
   projects: { api: 'cloudresourcemanager.googleapis.com', label: 'Cloud Resource Manager API', perProject: false },
-  services: { api: 'serviceusage.googleapis.com', label: 'Service Usage API', perProject: true },
+  services: { api: 'serviceusage.googleapis.com', label: 'Service Usage API', perProject: false },
   run: { api: 'run.googleapis.com', label: 'Cloud Run Admin API', perProject: true },
   sql: { api: 'sqladmin.googleapis.com', label: 'Cloud SQL Admin API', perProject: true },
   vertex: { api: 'aiplatform.googleapis.com', label: 'Vertex AI API', perProject: true },
@@ -39,6 +40,7 @@ export function findingsFromSnapshot(snapshot: Snapshot, config: Config, quotaPr
   const accounts = (accountsResult?.ok ? accountsResult.data : accountsResult?.lastGood?.data) as BillingAccountInfo[] | undefined;
   const accountName = (id: string) => accounts?.find((a) => a.id === id)?.displayName ?? id;
 
+  const unused = new Map<string, { label: string; projects: string[] }>();
   for (const [key, r] of Object.entries(snapshot.sources)) {
     if (r.ok) continue;
     const [family = key, scope] = key.split(':');
@@ -55,8 +57,10 @@ export function findingsFromSnapshot(snapshot: Snapshot, config: Config, quotaPr
     }
     if (r.kind === 'disabled' && meta) {
       if (meta.perProject && scope) {
-        // A project that doesn't use a service is normal: informational, not a failure.
-        push({ area: 'api', level: 'warn', projectId: scope, message: `${meta.label} not enabled in ${scope}, so that section stays unavailable`, link: apiLibraryUrl(meta.api, scope) });
+        // A project that doesn't use a service is normal: one grouped note per API, not a failure.
+        const u = unused.get(meta.api) ?? { label: meta.label, projects: [] };
+        if (!u.projects.includes(scope)) u.projects.push(scope);
+        unused.set(meta.api, u);
       } else {
         push({ area: 'api', level: 'fail', message: `${meta.label} is not enabled in your quota project${quotaProject ? ` (${quotaProject})` : ''}`, nextStep: 'enable it yourself in the console — CloudBar never enables APIs', link: apiLibraryUrl(meta.api, quotaProject) });
       }
@@ -72,6 +76,10 @@ export function findingsFromSnapshot(snapshot: Snapshot, config: Config, quotaPr
     if (family === 'costs' && r.kind === 'quota') {
       push({ area: 'billingExport', level: 'fail', message: `Spend query for “${accountName(scope ?? '')}” was not run: ${r.reason}`, nextStep: 'check the export table name, or raise maxBytesBilled in the config' });
     }
+  }
+  for (const [, u] of unused) {
+    const list = u.projects.sort();
+    push({ area: 'api', level: 'warn', message: `${u.label} is off in ${list.length} project${list.length === 1 ? '' : 's'} (fine if unused): ${list.join(', ')}` });
   }
   for (const id of Object.keys(config.billingExports)) {
     if (accounts && !accounts.some((a) => a.id === id))
