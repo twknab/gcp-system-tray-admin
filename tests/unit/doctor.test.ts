@@ -78,11 +78,33 @@ describe('setup check (Story 4)', () => {
         { method: 'POST', match: 'https://bigquery.googleapis.com/', body: { jobComplete: true, totalBytesProcessed: '1', rows: [] } },
       ],
     });
-    expect(f.find((x) => x.area === 'billingExport' && x.level === 'fail')?.message).toContain('not found');
+    expect(f.some((x) => x.area === 'billingExport' && x.level === 'fail' && x.message.includes('not found'))).toBe(true);
   });
   it('warns, not fails, when budgets are denied', async () => {
     const f = await doctor({ quota: 'fake-quota', routes: [accounts, { match: 'https://billingbudgets.googleapis.com/', status: 403, body: { error: { message: 'denied' } } }] });
     expect(f.find((x) => x.area === 'budgets')).toMatchObject({ level: 'warn' });
+  });
+});
+
+describe('placeholder config (field report: copied example config)', () => {
+  it('flags example values and does not claim the quota project works', async () => {
+    const f = await doctor({
+      quota: 'example-project',
+      config: { quotaProject: 'example-project', billingExports: { '000000-000000-000000': TABLE } },
+      routes: [{ match: 'https://', status: 403, body: { error: { message: 'x', details: [{ '@type': 'type.googleapis.com/google.rpc.ErrorInfo', reason: 'USER_PROJECT_DENIED' }] } } }],
+    });
+    expect(f.filter((x) => x.level === 'fail').map((x) => x.message)).toEqual(expect.arrayContaining([
+      'quotaProject in your config is the placeholder "example-project"',
+      expect.stringContaining('billingExports in your config still has the placeholder'),
+    ]));
+    expect(f.some((x) => x.area === 'quotaProject' && x.level === 'pass')).toBe(false);
+    expect(f.find((x) => x.message.startsWith('Cannot read dataset'))?.nextStep).toBe('fix the quota project first (see above)');
+  });
+  it('the shipped example config contains no placeholders', async () => {
+    const { readFileSync } = await import('node:fs');
+    const example = JSON.parse(readFileSync(join(__dirname, '..', '..', 'config.example.json'), 'utf8'));
+    expect(example.quotaProject).toBeUndefined();
+    expect(example.billingExports).toBeUndefined();
   });
 });
 

@@ -26,9 +26,22 @@ async function checkExportTables(ctx: Context): Promise<SetupFinding[]> {
         : { area: 'billingExport', level: 'fail', message: `Table ${name} not found in ${project}.${dataset}`, nextStep: 'the export may still be starting (up to 24h); otherwise check the name with: bq ls ' + `${project}:${dataset}` });
     } catch (err) {
       const f = toFailure(err);
-      out.push({ area: 'billingExport', level: 'fail', message: `Cannot read dataset ${project}.${dataset}: ${f.reason}`, nextStep: 'you need roles/bigquery.dataViewer on the dataset' });
+      const nextStep = f.kind === 'auth' ? 'fix the quota project first (see above)' : f.kind === 'denied' ? 'you need roles/bigquery.dataViewer on the dataset' : 'check the table name in billingExports';
+      out.push({ area: 'billingExport', level: 'fail', message: `Cannot read dataset ${project}.${dataset}: ${f.reason}`, nextStep });
     }
   }
+  return out;
+}
+
+/** Values copied from an example config would make every call fail; say so plainly. */
+export function placeholderFindings(ctx: Pick<Context, 'config' | 'quotaProject'>): SetupFinding[] {
+  const out: SetupFinding[] = [];
+  const looksFake = (s: string) => /^example-/.test(s) || /^(\d)\1{5}-\1{6}-\1{6}$/.test(s);
+  if (ctx.config.quotaProject && looksFake(ctx.config.quotaProject))
+    out.push({ area: 'quotaProject', level: 'fail', message: `quotaProject in your config is the placeholder "${ctx.config.quotaProject}"`, nextStep: `remove it from ${ctx.config.path}, or set it to a project you own` });
+  for (const [id, table] of Object.entries(ctx.config.billingExports))
+    if (looksFake(id) || looksFake(table))
+      out.push({ area: 'billingExport', level: 'fail', message: `billingExports in your config still has the placeholder entry for ${id}`, nextStep: `remove it from ${ctx.config.path} until your export exists (docs/billing-export-setup.md)` });
   return out;
 }
 
@@ -45,14 +58,18 @@ export async function runDoctor(ctx: Context, opts: DoctorOptions): Promise<Setu
     return findings; // nothing else can be checked
   }
 
-  findings.push(ctx.quotaProject
-    ? { area: 'quotaProject', level: 'pass', message: `Quota project: ${ctx.quotaProject}` }
-    : { area: 'quotaProject', level: 'fail', message: 'No quota project is set; several APIs refuse user credentials without one', nextStep: `run: ${QUOTA_STEP}` });
+  const placeholders = placeholderFindings(ctx);
+  findings.push(...placeholders);
 
   let snapshot: Snapshot = emptySnapshot();
   snapshot = (await refresh(snapshot, ctx.planner, { force: true, now: opts.now })).snapshot;
   const fromSources = findingsFromSnapshot(snapshot, ctx.config, ctx.quotaProject);
   findings.push(...fromSources);
+  // Only claim the quota project works if nothing said otherwise.
+  const quotaBroken = fromSources.some((f) => f.area === 'quotaProject' && f.level === 'fail') || placeholders.some((f) => f.area === 'quotaProject');
+  if (!ctx.quotaProject)
+    findings.push({ area: 'quotaProject', level: 'fail', message: 'No quota project is set; several APIs refuse user credentials without one', nextStep: `run: ${QUOTA_STEP}` });
+  else if (!quotaBroken) findings.push({ area: 'quotaProject', level: 'pass', message: `Quota project: ${ctx.quotaProject}` });
   if (Object.keys(ctx.config.billingExports).length === 0 && !fromSources.some((f) => f.area === 'billingExport'))
     findings.push({ area: 'billingExport', level: 'warn', message: 'No billing export is configured, so spend is unavailable', nextStep: 'follow docs/billing-export-setup.md' });
   findings.push(...(await checkExportTables(ctx)));

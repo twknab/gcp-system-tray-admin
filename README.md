@@ -53,9 +53,8 @@ gcloud auth application-default set-quota-project <a-project-you-own>
 git clone https://github.com/twknab/gcp-system-tray-admin ~/Development/cloudbar
 cd ~/Development/cloudbar && npm ci && npm run build
 
-# 3. Configure
+# 3. Configure (the example is safe as-is; add billingExports once your export exists)
 mkdir -p ~/.config/cloudbar && cp config.example.json ~/.config/cloudbar/config.json
-#    edit it: billing export tables, quota project, Vertex AI regions, projects to exclude
 
 # 4. Check setup
 node dist/cli.js doctor
