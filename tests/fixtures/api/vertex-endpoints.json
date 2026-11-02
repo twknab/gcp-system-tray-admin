@@ -1,0 +1,6 @@
+{
+  "endpoints": [
+    { "name": "projects/123456789012/locations/us-central1/endpoints/111", "displayName": "gemma-chat", "deployedModels": [{ "id": "1", "model": "projects/123456789012/locations/us-central1/models/9" }] },
+    { "name": "projects/123456789012/locations/us-central1/endpoints/222", "displayName": "empty-endpoint" }
+  ]
+}

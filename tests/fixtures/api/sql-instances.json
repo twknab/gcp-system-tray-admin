@@ -1,0 +1,12 @@
+{
+  "items": [
+    { "name": "main-db", "state": "RUNNABLE", "region": "us-central1", "databaseVersion": "POSTGRES_16", "settings": { "activationPolicy": "ALWAYS" } },
+    { "name": "old-db", "state": "RUNNABLE", "region": "us-central1", "databaseVersion": "MYSQL_8_0", "settings": { "activationPolicy": "NEVER" } },
+    { "name": "maint-db", "state": "MAINTENANCE", "region": "us-east1", "settings": { "activationPolicy": "ALWAYS" } },
+    { "name": "repair-db", "state": "REPAIRING", "region": "us-east1", "settings": { "activationPolicy": "ALWAYS" } },
+    { "name": "dead-db", "state": "FAILED", "region": "us-east1", "settings": { "activationPolicy": "ALWAYS" } },
+    { "name": "unpaid-db", "state": "SUSPENDED", "region": "us-east1", "settings": { "activationPolicy": "ALWAYS" } },
+    { "name": "new-db", "state": "PENDING_CREATE", "region": "us-east1" },
+    { "name": "bye-db", "state": "PENDING_DELETE", "region": "us-east1" }
+  ]
+}

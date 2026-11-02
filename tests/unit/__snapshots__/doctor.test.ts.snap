@@ -1,0 +1,24 @@
+// Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
+
+exports[`setup check output > swiftbar 1`] = `
+[
+  "No quota project is set | sfimage=xmark.octagon.fill sfcolor=#D70015,#FF453A",
+  "--→ run: gcloud auth application-default set-quota-project <a-project-you-own>",
+  "Cloud SQL Admin API not enabled in fake-blog | sfimage=exclamationmark.triangle.fill sfcolor=#B25000,#FF9F0A href=https://console.cloud.google.com/apis/library/sqladmin.googleapis.com?project=fake-blog",
+  "Signed in (Application Default Credentials) | sfimage=checkmark.circle.fill sfcolor=#248A3D,#30D158",
+]
+`;
+
+exports[`setup check output > text 1`] = `
+[
+  "CloudBar setup check (read-only — nothing is changed or enabled)",
+  "",
+  "✗ No quota project is set",
+  "    → run: gcloud auth application-default set-quota-project <a-project-you-own>",
+  "! Cloud SQL Admin API not enabled in fake-blog",
+  "    https://console.cloud.google.com/apis/library/sqladmin.googleapis.com?project=fake-blog",
+  "✓ Signed in (Application Default Credentials)",
+  "",
+  "1 problem(s) to fix, 1 note(s).",
+]
+`;

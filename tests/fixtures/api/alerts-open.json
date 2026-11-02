@@ -1,0 +1,25 @@
+{
+  "alerts": [
+    {
+      "name": "projects/fake-alpha/alerts/0.abc123",
+      "state": "OPEN",
+      "openTime": "2026-10-17T11:30:00Z",
+      "resource": { "type": "cloud_run_revision", "labels": { "service_name": "api", "location": "us-central1", "project_id": "fake-alpha" } },
+      "policy": { "name": "projects/fake-alpha/alertPolicies/1", "displayName": "Cloud Run 5xx", "severity": "CRITICAL" }
+    },
+    {
+      "name": "projects/fake-alpha/alerts/0.def456",
+      "state": "OPEN",
+      "openTime": "2026-10-16T08:00:00Z",
+      "resource": { "type": "cloudsql_database", "labels": { "database_id": "fake-alpha:main-db" } },
+      "policy": { "displayName": "SQL CPU (MQL)", "severity": "WARNING" }
+    },
+    {
+      "name": "projects/fake-alpha/alerts/0.ghi789",
+      "state": "OPEN",
+      "openTime": "2026-10-17T10:00:00Z",
+      "resource": { "type": "gce_instance", "labels": {} },
+      "policy": { "displayName": "Some VM thing" }
+    }
+  ]
+}

@@ -1,0 +1,7 @@
+{
+  "projects": [
+    { "name": "projects/123456789012", "projectId": "fake-alpha", "displayName": "Alpha", "state": "ACTIVE" },
+    { "name": "projects/223456789012", "projectId": "fake-beta", "displayName": "Beta", "state": "ACTIVE" },
+    { "name": "projects/323456789012", "projectId": "fake-sandbox", "displayName": "Sandbox", "state": "ACTIVE" }
+  ]
+}

@@ -1,0 +1,8 @@
+{
+  "services": [
+    { "name": "projects/123456789012/services/run.googleapis.com", "config": { "name": "run.googleapis.com" }, "state": "ENABLED" },
+    { "name": "projects/123456789012/services/storage.googleapis.com", "config": { "name": "storage.googleapis.com" }, "state": "ENABLED" },
+    { "name": "projects/123456789012/services/monitoring.googleapis.com", "config": { "name": "monitoring.googleapis.com" }, "state": "ENABLED" }
+  ],
+  "nextPageToken": "page2"
+}

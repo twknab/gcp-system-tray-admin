@@ -1,0 +1,11 @@
+{
+  "timeSeries": [
+    {
+      "metric": { "type": "storage.googleapis.com/storage/total_bytes" },
+      "resource": { "type": "gcs_bucket", "labels": { "bucket_name": "fake-alpha-assets", "project_id": "fake-alpha" } },
+      "metricKind": "GAUGE",
+      "valueType": "DOUBLE",
+      "points": [{ "interval": { "startTime": "2026-10-16T08:00:00Z", "endTime": "2026-10-17T08:00:00Z" }, "value": { "doubleValue": 412000000000 } }]
+    }
+  ]
+}
