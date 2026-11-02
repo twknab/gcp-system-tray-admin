@@ -96,6 +96,7 @@ export function buildServices(inp: ServicesInput): ServicesView {
         consoleUrl: r.consoleUrl,
       })),
       unavailable,
+      url: g.url,
     };
     if (items.length > GROUP_CAP) group.overflow = { count: items.length - GROUP_CAP, url: g.url };
     groups.push(group);

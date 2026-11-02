@@ -11,7 +11,8 @@ export function renderServices(v: ViewModel): string[] {
     return out;
   }
   for (const g of v.groups) {
-    out.push(ln(g.label, statusParams(g.status)));
+    // Every line gets an action: SwiftBar greys out lines that have none.
+    out.push(ln(g.label, { ...statusParams(g.status), href: g.url }));
     for (const item of g.items) {
       out.push(ln(item.title, { ...statusParams(item.status), ...(item.tooltip ? { tooltip: item.tooltip } : {}) }, 1));
       for (const d of item.details) out.push(ln(d, {}, 2, 80));
@@ -29,7 +30,7 @@ export function renderServices(v: ViewModel): string[] {
 
 export function renderProjects(v: ViewModel): string[] {
   if (!v.projects) return [];
-  const out = [ln(`Projects (${v.projects.length})`, { sfimage: 'folder' })];
+  const out = [ln(`Projects (${v.projects.length})`, { sfimage: 'folder', href: 'https://console.cloud.google.com/cloud-resource-manager' })];
   if (v.projectsUnavailable) out.push(ln(v.projectsUnavailable, { color: MUTED }, 1, 100));
   for (const p of v.projects) {
     const apis = p.apiCount === null ? 'APIs unknown' : `${p.apiCount} API${p.apiCount === 1 ? '' : 's'}`;

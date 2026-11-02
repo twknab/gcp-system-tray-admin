@@ -149,6 +149,19 @@ docs/
 network and are impure), **model** (pure), and **render** (pure). Only `sources/`, `auth.ts`,
 `http.ts`, and `cache.ts` touch I/O.
 
+## Field change (2026-11-02): render from cache, refresh in the background
+
+Live use showed rows greyed out and unclickable while SwiftBar rebuilt the menu during a refresh
+that took several seconds.
+
+- `render` now prints from the cache immediately, in about 0.1 s.
+- If the cache is more than 60 s old, `render` spawns a detached `cloudbar refresh --due`.
+- `MenuAction`, `FirstLaunch` and `WakeFromSleep` spawn a forced refresh instead.
+- Only the first run, with an empty cache, fetches before printing.
+- The lock still prevents overlapping refreshes.
+- Every header and info line now carries an `href` to its console page, because SwiftBar greys
+  out lines that have no action.
+
 ## Glossary
 
 - **Setup check** (as the menu and spec call it) and **`doctor`** (the CLI command and

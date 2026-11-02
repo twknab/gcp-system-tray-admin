@@ -206,6 +206,8 @@ export interface ViewGroup {
   count: number;
   status: Status;
   items: ViewItem[];
+  /** console page for this service; gives the header a click action */
+  url: string;
   overflow?: { count: number; url: string };
   unavailable: { projectLabel: string; reason: string }[];
 }

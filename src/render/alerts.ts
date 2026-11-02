@@ -8,12 +8,13 @@ export function renderAlerts(v: ViewModel): string[] {
   const a = v.alerts;
   if (!a) return [];
   const policies = a.policyCount === null ? '' : ` · ${a.policyCount} polic${a.policyCount === 1 ? 'y' : 'ies'}`;
-  const out = [ln(a.alerts.length ? `Alerts (${a.alerts.length} open)` : 'Alerts', { sfimage: 'bell' })];
+  const ALERTS_URL = 'https://console.cloud.google.com/monitoring/alerting';
+  const out = [ln(a.alerts.length ? `Alerts (${a.alerts.length} open)` : 'Alerts', { sfimage: 'bell', href: ALERTS_URL })];
   if (!a.available) {
     out.push(ln(`Alerts unavailable — ${a.reason ?? 'unknown reason'}${policies}`, { sfimage: 'questionmark.circle', sfcolor: MUTED }));
     return out;
   }
-  if (a.alerts.length === 0) out.push(ln(`No open alerts${policies}`));
+  if (a.alerts.length === 0) out.push(ln(`No open alerts${policies}`, { href: ALERTS_URL }));
   for (const x of a.alerts) out.push(ln(x.title, { ...statusParams(x.status), href: x.url }, 0, 80));
   if (a.reason) out.push(ln(`Partial — ${a.reason}`, { color: MUTED, size: 11 }));
   return out;

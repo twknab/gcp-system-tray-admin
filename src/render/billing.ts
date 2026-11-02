@@ -18,7 +18,8 @@ function budgetText(l: BudgetLine): string {
 
 export function renderBilling(v: ViewModel): string[] {
   const b = v.billing;
-  const out = [ln('Billing', { sfimage: 'creditcard' })];
+  const BILLING_URL = 'https://console.cloud.google.com/billing';
+  const out = [ln('Billing', { sfimage: 'creditcard', href: BILLING_URL })];
   if (!b.available) {
     if (b.unavailableReason === 'export not set up') {
       out.push(ln('Costs unavailable — export not set up', { sfimage: 'questionmark.circle', sfcolor: STATUS_STYLE.unknown.sfcolor, bash: '/usr/bin/open', param0: v.paths.docs, terminal: false }));
@@ -28,15 +29,15 @@ export function renderBilling(v: ViewModel): string[] {
     }
   } else {
     const partial = b.coveredAccounts < b.visibleAccounts ? ` (partial ${b.coveredAccounts} of ${b.visibleAccounts} accounts)` : '';
-    out.push(ln(`${monthName(b.monthLabel)} to date  ${formatMoneyByCurrency(b.mtd)}${partial}`));
-    out.push(ln(`${monthName(b.lastMonthLabel)}  ${b.lastMonth ? formatMoneyByCurrency(b.lastMonth) : 'not available'}`));
+    out.push(ln(`${monthName(b.monthLabel)} to date  ${formatMoneyByCurrency(b.mtd)}${partial}`, { href: BILLING_URL }));
+    out.push(ln(`${monthName(b.lastMonthLabel)}  ${b.lastMonth ? formatMoneyByCurrency(b.lastMonth) : 'not available'}`, { href: BILLING_URL }));
   }
   const lines = b.budgetLines;
   const anyBudgetsUnavailable = b.accounts.find((a) => a.budgetsUnavailable);
   if (lines.length) {
     for (const l of lines) {
       const over = l.remainingMinor !== null && l.remainingMinor < 0;
-      out.push(ln(budgetText(l), over ? { sfimage: STATUS_STYLE.degraded.sfimage, sfcolor: STATUS_STYLE.degraded.sfcolor } : {}));
+      out.push(ln(budgetText(l), over ? { sfimage: STATUS_STYLE.degraded.sfimage, sfcolor: STATUS_STYLE.degraded.sfcolor, href: BUDGETS_URL } : { href: BUDGETS_URL }));
     }
   } else if (anyBudgetsUnavailable) {
     out.push(ln(`Budget unavailable — ${anyBudgetsUnavailable.budgetsUnavailable}`, { color: MUTED }));

@@ -5,7 +5,8 @@ import { setup } from './setup.js';
 describe('read-only proof (SC-006, Principle I)', () => {
   it('every request is a GET or a capped BigQuery query', async () => {
     const t = setup();
-    await main([], t.deps({ SWIFTBAR_PLUGIN_REFRESH_REASON: 'MenuAction' }));
+    await main([], t.deps());
+    await main(['refresh'], t.deps());
     await main(['doctor'], t.deps());
     expect(t.log.length).toBeGreaterThan(30);
     for (const r of t.log) {

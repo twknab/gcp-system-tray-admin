@@ -53,7 +53,7 @@ describe('service groups (Story 2)', () => {
   });
   it('lists projects with API counts and billing state', () => {
     const lines = render(viewOf('services'));
-    expect(lines).toContain('Projects (3) | sfimage=folder');
+    expect(lines).toContain('Projects (3) | sfimage=folder href=https://console.cloud.google.com/cloud-resource-manager');
     expect(lines.some((l) => l.startsWith('--Sandbox · 21 APIs · billing disabled'))).toBe(true);
   });
 });

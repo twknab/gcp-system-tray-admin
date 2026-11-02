@@ -4,7 +4,7 @@ exports[`minimal menu (no cache, no network) > renders title, unknown status and
 [
   "| sfimage=icloud sfcolor=#6E6E73,#98989D tooltip="CloudBar — unknown: no services checked yet"",
   "---",
-  "Billing | sfimage=creditcard",
+  "Billing | sfimage=creditcard href=https://console.cloud.google.com/billing",
   "Costs unavailable — no billing data yet | sfimage=questionmark.circle sfcolor=#6E6E73,#98989D",
   "---",
   "Not updated yet | color=#6E6E73,#98989D size=11",

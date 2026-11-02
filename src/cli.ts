@@ -1,5 +1,6 @@
 #!/usr/bin/env node
 // Entry point. `render` (default) always exits 0 and always prints a valid menu.
+import { spawn } from 'node:child_process';
 import { readFileSync } from 'node:fs';
 import { dirname, join, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
@@ -26,7 +27,12 @@ export interface CliDeps {
   out: (s: string) => void;
   getToken?: () => Promise<string>;
   adcQuotaProject?: () => Promise<string | undefined>;
+  /** start a background refresh; injected in tests so no real process is spawned */
+  spawnRefresh?: (force: boolean) => void;
 }
+
+/** Cached data older than this triggers a background refresh (each source still honours its own TTL). */
+export const BACKGROUND_REFRESH_AFTER_MS = 60_000;
 
 export interface Args {
   command: 'render' | 'refresh' | 'doctor';
@@ -34,10 +40,12 @@ export interface Args {
   config?: string | undefined;
   noCache: boolean;
   swiftbar: boolean;
+  /** `refresh --due`: refetch only sources past their TTL (used by the background refresh) */
+  due: boolean;
 }
 
 export function parseArgs(argv: string[]): Args {
-  const a: Args = { command: 'render', noCache: false, swiftbar: false };
+  const a: Args = { command: 'render', noCache: false, swiftbar: false, due: false };
   for (let i = 0; i < argv.length; i++) {
     const x = argv[i]!;
     if (x === 'render' || x === 'refresh' || x === 'doctor') a.command = x;
@@ -45,6 +53,7 @@ export function parseArgs(argv: string[]): Args {
     else if (x === '--config') a.config = argv[++i];
     else if (x === '--no-cache') a.noCache = true;
     else if (x === '--swiftbar') a.swiftbar = true;
+    else if (x === '--due') a.due = true;
   }
   return a;
 }
@@ -104,6 +113,13 @@ export async function collect(args: Args, deps: CliDeps, force: boolean): Promis
   return { snapshot: result?.snapshot ?? cached, config: ctx.config, configIssue: ctx.configIssue, quotaProject: ctx.quotaProject };
 }
 
+function defaultSpawnRefresh(args: Args, env: NodeJS.ProcessEnv): (force: boolean) => void {
+  return (force) => {
+    const argv = [paths().cli, 'refresh', ...(force ? [] : ['--due']), ...(args.config ? ['--config', args.config] : [])];
+    spawn(process.execPath, argv, { detached: true, stdio: 'ignore', env }).unref();
+  };
+}
+
 export function viewFor(c: Collected, now: Date): ViewModel {
   return buildView(c.snapshot, c.config, now, paths(), { setupIssues: c.configIssue ? [c.configIssue] : [], quotaProject: c.quotaProject });
 }
@@ -122,10 +138,23 @@ export async function main(argv: string[], deps: CliDeps): Promise<number> {
     const { runDoctorCommand } = await import('./doctor.js');
     return runDoctorCommand(await createContext(args, deps), { swiftbar: args.swiftbar, now: deps.now, out: deps.out, docsPath: paths().docs });
   }
-  const force = args.command === 'refresh' || FORCE_REASONS.has(deps.env.SWIFTBAR_PLUGIN_REFRESH_REASON ?? '');
+  const forceReason = FORCE_REASONS.has(deps.env.SWIFTBAR_PLUGIN_REFRESH_REASON ?? '');
   try {
-    const c = await collect(args, deps, force);
-    if (args.command === 'render') deps.out(renderMenu(viewFor(c, deps.now())).join('\n'));
+    if (args.command === 'refresh') {
+      await collect(args, deps, !args.due);
+      return 0;
+    }
+    // render: answer SwiftBar instantly from the cache and fetch in the background, so the menu
+    // is never rebuilt while it is open (field report: rows greyed out mid-refresh).
+    const cached = args.noCache ? emptySnapshot() : loadSnapshot(cacheDir(deps.env));
+    if (args.noCache || !cached.updatedAt) {
+      deps.out(renderMenu(viewFor(await collect(args, deps, forceReason), deps.now())).join('\n'));
+      return 0;
+    }
+    const { config, issue } = loadConfigSafe(args.config ?? defaultConfigPath(deps.env));
+    deps.out(renderMenu(viewFor({ snapshot: cached, config, configIssue: issue, quotaProject: config.quotaProject }, deps.now())).join('\n'));
+    const age = deps.now().getTime() - Date.parse(cached.updatedAt);
+    if (forceReason || age > BACKGROUND_REFRESH_AFTER_MS) (deps.spawnRefresh ?? defaultSpawnRefresh(args, deps.env))(forceReason);
   } catch (err) {
     if (args.command === 'render') {
       const fallback = buildView(emptySnapshot(), parseConfig({}, defaultConfigPath(deps.env)), now, paths(), {

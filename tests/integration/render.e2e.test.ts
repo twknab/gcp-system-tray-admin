@@ -27,12 +27,36 @@ describe('end to end: render through the CLI with every API mocked', () => {
     expect(elapsed).toBeLessThan(300); // plan target; SC-002 fails above 1 s
     expect(t.out[1]).toBe(t.out[0]);
   });
-  it('MenuAction refetches everything (Story 4 #4)', async () => {
+  it('renders from cache instantly and refreshes in the background (field report: greyed rows mid-refresh)', async () => {
+    const t = setup();
+    await main([], t.deps());
+    const first = t.log.length;
+    expect(t.spawned).toEqual([]);
+    t.advance(10 * 60_000);
+    await main([], t.deps());
+    expect(t.log.length).toBe(first); // the render itself made no request
+    expect(t.out[1]!.split('\n').length).toBe(t.out[0]!.split('\n').length);
+    expect(t.out[1]).toContain('Updated 10m ago');
+    expect(t.spawned).toEqual([false]); // background refresh of due sources only
+  });
+  it('MenuAction forces a background refresh; `refresh` refetches everything (Story 4 #4)', async () => {
     const t = setup();
     await main([], t.deps());
     const first = t.log.length;
     await main([], t.deps({ SWIFTBAR_PLUGIN_REFRESH_REASON: 'MenuAction' }));
+    expect(t.spawned).toEqual([true]);
+    await main(['refresh'], t.deps());
     expect(t.log.length - first).toBe(first - 1); // same calls, minus the one-time BigQuery dry run
+  });
+  it('`refresh --due` fetches only what is past its TTL', async () => {
+    const t = setup();
+    await main([], t.deps());
+    const first = t.log.length;
+    t.advance(6 * 60_000); // past the 5-minute alerts TTL only
+    await main(['refresh', '--due'], t.deps());
+    const fetched = t.log.slice(first).map((l) => l.url);
+    expect(fetched.length).toBeGreaterThan(0);
+    expect(fetched.every((u) => /\/alerts\?/.test(u))).toBe(true);
   });
   it('`refresh` prints nothing; render with no network still prints a valid menu', async () => {
     const t = setup();
