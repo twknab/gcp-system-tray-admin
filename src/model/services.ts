@@ -62,8 +62,9 @@ export function buildServices(inp: ServicesInput): ServicesView {
       const keys = g.type === 'vertex' ? config.vertexRegions.map((r) => `vertex:${p.projectId}:${r}`) : [`${g.type}:${p.projectId}`];
       for (const key of keys) {
         const r = snapshot.sources[key] as SourceResult<ResourceList> | undefined;
-        // A disabled API means the project has none of these (it cannot without the API): not "unavailable".
-        if (r && !r.ok && r.kind === 'disabled' && !r.lastGood) continue;
+        // A disabled API means the project has none of these (it cannot without the API): not
+        // "unavailable", and any data from before it was turned off is no longer true.
+        if (r && !r.ok && r.kind === 'disabled') continue;
         const { data, note } = dataAndNote(r, now);
         if (note) unavailable.push({ projectLabel: p.displayName, reason: note });
         if (data) {

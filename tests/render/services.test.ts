@@ -1,6 +1,7 @@
 import { describe, expect, it } from 'vitest';
 import { STATUS_STYLE } from '../../src/render/swiftbar.js';
-import { render, viewOf } from './invariants.js';
+import { buildView } from '../../src/model/view.js';
+import { PATHS, loadFixture, render, viewOf } from './invariants.js';
 
 function groupHeaderCounts(lines: string[]) {
   // invariant 2: header count == number of items, including overflow
@@ -46,6 +47,13 @@ describe('service groups (Story 2)', () => {
     expect(lines.some((l) => l.includes('Alpha: permission denied: cloudsql.instances.list'))).toBe(true);
     expect(lines.some((l) => l.includes('Beta: showing data from 2h ago — network error'))).toBe(true);
     expect(lines.some((l) => l.includes('Cloud SQL Admin API not enabled'))).toBe(false);
+  });
+  it('drops old data once an API has been turned off (field report: 14-day-old buckets)', () => {
+    const f = loadFixture('services');
+    f.snapshot.sources['storage:fake-sandbox'] = { ok: false, kind: 'disabled', reason: 'Cloud Storage API not enabled', fetchedAt: f.snapshot.updatedAt, lastGood: { data: { resources: [] }, fetchedAt: '2026-10-03T12:00:00Z' } };
+    const lines = render(buildView(f.snapshot, f.config, f.now, PATHS));
+    expect(lines.some((l) => l.includes('showing data from') && l.includes('not enabled'))).toBe(false);
+    expect(lines.some((l) => l.startsWith('--fake-sandbox-scratch'))).toBe(false);
   });
   it('omits a group when no project has that resource type', () => {
     const v = viewOf('services');
