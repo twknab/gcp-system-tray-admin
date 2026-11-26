@@ -1,0 +1,12 @@
+{
+  "services": [
+    {
+      "name": "projects/fake-alpha/locations/us-central1/services/api",
+      "uri": "https://api-abc123-uc.a.run.app",
+      "reconciling": false,
+      "latestReadyRevision": "projects/fake-alpha/locations/us-central1/services/api/revisions/api-00042-xyz",
+      "latestCreatedRevision": "projects/fake-alpha/locations/us-central1/services/api/revisions/api-00042-xyz",
+      "terminalCondition": { "type": "Ready", "state": "CONDITION_SUCCEEDED" }
+    }
+  ]
+}

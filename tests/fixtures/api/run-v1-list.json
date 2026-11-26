@@ -1,0 +1,39 @@
+{
+  "apiVersion": "serving.knative.dev/v1",
+  "kind": "ServiceList",
+  "items": [
+    {
+      "metadata": { "name": "api", "namespace": "123456789012", "labels": { "cloud.googleapis.com/location": "us-central1" } },
+      "status": {
+        "url": "https://api-abc123-uc.a.run.app",
+        "latestReadyRevisionName": "api-00042-xyz",
+        "latestCreatedRevisionName": "api-00042-xyz",
+        "conditions": [{ "type": "Ready", "status": "True" }, { "type": "ConfigurationsReady", "status": "True" }, { "type": "RoutesReady", "status": "True" }]
+      }
+    },
+    {
+      "metadata": { "name": "worker", "namespace": "123456789012", "labels": { "cloud.googleapis.com/location": "europe-west1" } },
+      "status": {
+        "latestReadyRevisionName": "worker-00007-aaa",
+        "latestCreatedRevisionName": "worker-00008-bbb",
+        "conditions": [{ "type": "Ready", "status": "False", "reason": "RevisionFailed", "message": "Revision 'worker-00008-bbb' is not ready" }]
+      }
+    },
+    {
+      "metadata": { "name": "broken", "namespace": "123456789012", "labels": { "cloud.googleapis.com/location": "us-central1" } },
+      "status": {
+        "latestCreatedRevisionName": "broken-00001-ccc",
+        "conditions": [{ "type": "Ready", "status": "False", "reason": "HealthCheckContainerError", "message": "container failed to start" }]
+      }
+    },
+    {
+      "metadata": { "name": "rolling", "namespace": "123456789012", "labels": { "cloud.googleapis.com/location": "us-east1" } },
+      "status": {
+        "latestReadyRevisionName": "rolling-00002-ddd",
+        "latestCreatedRevisionName": "rolling-00003-eee",
+        "conditions": [{ "type": "Ready", "status": "Unknown" }]
+      }
+    }
+  ],
+  "unreachable": ["asia-east1"]
+}

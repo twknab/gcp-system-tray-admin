@@ -1,0 +1,112 @@
+{
+  "now": "2026-10-17T12:00:00Z",
+  "config": {
+    "billingExports": {
+      "000000-000000-000000": "example-project.billing.gcp_billing_export_v1_000000_000000_000000",
+      "111111-111111-111111": "example-project.billing.gcp_billing_export_v1_111111_111111_111111"
+    }
+  },
+  "snapshot": {
+    "schemaVersion": 1,
+    "updatedAt": "2026-10-17T11:57:00.000Z",
+    "sources": {
+      "billingAccounts": {
+        "ok": true,
+        "data": [
+          {
+            "id": "000000-000000-000000",
+            "displayName": "Personal",
+            "open": true,
+            "currencyCode": "USD"
+          },
+          {
+            "id": "111111-111111-111111",
+            "displayName": "Side projects",
+            "open": true,
+            "currencyCode": "USD"
+          },
+          {
+            "id": "222222-222222-222222",
+            "displayName": "Old account",
+            "open": false,
+            "currencyCode": "USD"
+          }
+        ],
+        "fetchedAt": "2026-10-17T11:57:00.000Z"
+      },
+      "costs:000000-000000-000000": {
+        "ok": true,
+        "data": {
+          "table": "x",
+          "rows": [
+            {
+              "month": "202610",
+              "currency": "USD",
+              "netMinor": 2010
+            },
+            {
+              "month": "202609",
+              "currency": "USD",
+              "netMinor": 2800
+            }
+          ],
+          "exportTime": "2026-10-17T09:00:00.000Z",
+          "dryRunBytes": 1048576
+        },
+        "fetchedAt": "2026-10-17T11:57:00.000Z"
+      },
+      "costs:111111-111111-111111": {
+        "ok": true,
+        "data": {
+          "table": "x",
+          "rows": [
+            {
+              "month": "202610",
+              "currency": "USD",
+              "netMinor": 472
+            },
+            {
+              "month": "202609",
+              "currency": "USD",
+              "netMinor": 345
+            }
+          ],
+          "exportTime": "2026-10-17T09:00:00.000Z",
+          "dryRunBytes": 1048576
+        },
+        "fetchedAt": "2026-10-17T11:57:00.000Z"
+      },
+      "budgets:000000-000000-000000": {
+        "ok": true,
+        "data": [
+          {
+            "name": "Monthly cap",
+            "scope": "account",
+            "period": "month",
+            "amount": {
+              "kind": "specified",
+              "minor": 5000,
+              "currency": "USD"
+            }
+          },
+          {
+            "name": "Vertex only",
+            "scope": "filtered",
+            "period": "month",
+            "amount": {
+              "kind": "specified",
+              "minor": 2000,
+              "currency": "USD"
+            }
+          }
+        ],
+        "fetchedAt": "2026-10-17T11:57:00.000Z"
+      },
+      "budgets:111111-111111-111111": {
+        "ok": true,
+        "data": [],
+        "fetchedAt": "2026-10-17T11:57:00.000Z"
+      }
+    }
+  }
+}
