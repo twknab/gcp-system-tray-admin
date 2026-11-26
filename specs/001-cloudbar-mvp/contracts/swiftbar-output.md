@@ -60,7 +60,7 @@ Billing accounts (3) | sfimage=building.columns                    ← when >1 a
 --<Account>: Costs unavailable — export not set up | href=<billing console>
 ---
 Cloud Run (4) | sfimage=<worst> sfcolor=<worst>
---api · hughes-intel | sfimage=… sfcolor=…
+--api · example-project | sfimage=… sfcolor=…
 ----State: Ready · rev 00042
 ----Location: us-central1
 ----Status: healthy
@@ -77,7 +77,7 @@ No open alerts · 7 policies                                         ← or one 
 Checkout 5xx rate · Gamma · critical · open 30m | sfimage=xmark.octagon.fill … href=<alert console>
 ---
 Projects (6) | sfimage=folder
---Hughes Intelligence · 23 APIs | href=https://console.cloud.google.com/home/dashboard?project=…
+--Example Project · 23 APIs | href=https://console.cloud.google.com/home/dashboard?project=…
 ---
 ⚠ 2 setup issues | sfimage=exclamationmark.triangle sfcolor=#FF9F0A   ← only when a check fails
 --Credentials expired — run: gcloud auth application-default login

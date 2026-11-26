@@ -13,7 +13,7 @@ Budget “Monthly cap” $50.00 · $25.18 left
 Cost data as of 3h ago
 ───────────────
 Cloud Run (4)              ✓
-  api · Hughes Intelligence ✓
+  api · Example Project ✓
 Cloud SQL (1)              ?  not monitored
 Cloud Storage (8 buckets · 412 GB)
 ───────────────

@@ -32,7 +32,7 @@ type SourceResult<T> =
 ```
 
 - `reason` is a plain-English sentence, for example "Cloud SQL Admin API not enabled in
-  hughes-intel".
+  example-project".
 - A result is **stale** when `now - fetchedAt(of data shown) > ttl(source)` (FR-015a).
 
 ## Project
